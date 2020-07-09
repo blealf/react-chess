@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Square from './Square';
 import chessPieces from '../data';
 
-import ChessPiece from './ChessPiece';
+import Piece from './Piece';
 
 
 const BoardWrapper = styled.div`
@@ -11,21 +11,74 @@ const BoardWrapper = styled.div`
   width: 700px;
   height: 700px;
   border: 1px solid black;
-  transform: rotateY(0deg) rotateX(20deg);
-  -webkit-transform: rotateY(0deg) rotateX(25deg);
+  transform: rotateY(-10deg) rotateX(20deg);
+  -webkit-transform: rotateY(-10deg) rotateX(25deg);
   box-shadow: 50px 50px 205px #1a202c, 0 1px 40px teal;
   // background: #1a202c;
 `;
 
+
+
 const Board = () => {
 
   const initialPosition = chessPieces;
-  const [position, setPosition] = useState(initialPosition);
+  const [ position, setPosition ] = useState(initialPosition);
+  const [ moveColor, setMoveColor ] = useState([
+    { id: "",
+      color: ""
+    }
+  ]);
+
+  const diagonal = (position) => {
+    let x = position[0]
+    let y = position[1]
+    let canMove = []
+    if (JSON.stringify(position) !== [0,0]||[0,7]||[7,0]||[7,7]){
+      canMove = [[x++, y++],[x--, y--]]
+    }
+    return canMove;
+  }
+  
+  const vertical = (position) => {
+    let x = position[0]
+    let y = position[1]
+    let canMove = []
+    if (JSON.stringify(position) !== [0,0]||[0,7]||[7,0]||[7,7]){
+      canMove = [[x++, y],[x, y++],[x--, y],[x, y--]]
+    }
+    return canMove;
+  }
+  
+  const horizontal = (position) => {
+    let x = position[0]
+    let y = position[1]
+    let canMove = []
+    if (JSON.stringify(position) !== [0,0]||[0,7]||[7,0]||[7,7]){
+      canMove = [[x++, y],[x, y++],[x--, y],[x, y--]]
+    }
+    return canMove;
+  }
 
   const onDragStart = (e) => {
     e.dataTransfer.setData('text', e.target.id);
-    e.currentTarget.style.backgroundColor = "red";
-    // console.log(e.target.id)
+    var piecePosition = []
+    e.target.getAttribute("position").split(",").forEach(num => {
+      piecePosition.push(parseInt(num))
+    })
+
+    determineDropLocation(piecePosition, e.currentTarget);
+    // console.log(piecePosition);
+
+  }
+
+  const setColor = (id, color) => {
+    let selectedColor = ""
+    moveColor.forEach(c => {
+      if(c.id === id){
+        selectedColor = c.color
+      } else { selectedColor =  color }
+    })
+    return selectedColor;
   }
 
   var checkedPattern = [];
@@ -33,30 +86,40 @@ const Board = () => {
 
   const createPattern = (color, currentPos) => {
     checkedPattern.push(<Square 
-      tileColor={color} 
-      key={JSON.stringify(currentPos)} 
-      position={currentPos}
-      allPositions={position}
-      piece={
-        position.filter(pos => (JSON.stringify(currentPos) === JSON.stringify(pos.value)))
-        .map(p => {
-            return(<ChessPiece
-              onDragStart={onDragStart}
-              color={(p.id.includes("w")) ? "white" : "black"} 
-              ID={p.id} 
-              name={p.title} 
-              key={p.id}
-              position={p.value}/>)
-              
-        })
-      }
+      tileColor={setColor(JSON.stringify(currentPos), color)} 
+      key={JSON.stringify(currentPos)}
+      ID={JSON.stringify(currentPos)}
+      squarePosition={currentPos}
+      boardMatrix={position}
+      onDragStart={onDragStart}
       changePosition={setPosition}
+      onChangeColor={(e) => changeColor(JSON.stringify(currentPos))}
       />)
+  }
+
+  const changeColor = (id) => {
+    checkedPattern.filter(square => 
+      id === square.props.position
+    ).forEach(color => {
+      setMoveColor([...moveColor, {id: id, color: "green"}])
+      // console.log(color);
+    })
+  }
+
+  const determineDropLocation = (getPos, square) => {
+      diagonal(getPos).filter(moves => 
+        checkedPattern.filter(pos => 
+          JSON.stringify(moves) === JSON.stringify(pos.props.position)
+        ).forEach(p => {
+          changeColor(p.props.position)
+        })
+      )
+      // square.style.backgroundColor = "green";
   }
 
   for(let i = 0; i < 8; i++){
     for(let j = 0; j < 8; j++){
-      (swap) ? createPattern("white", [i,j]) : createPattern("non-white", [i,j]);
+      (swap) ? createPattern("white", [i,j]) : createPattern("brown", [i,j]);
       swap = (j<7) ? !swap : swap;
     }
   }

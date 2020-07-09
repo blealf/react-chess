@@ -1,58 +1,71 @@
 import React from 'react';
+import Piece from './Piece';
 
-const Square = ({tileColor, piece, allPositions, changePosition, position}) => {
+const Square = ({
+  boardMatrix,
+  changePosition,
+  ID,
+  onDragStart,
+  squarePosition,
+  tileColor
+}) => {
   var squareRef = React.useRef();
   
+  const movePiece = (id) => {
+    boardMatrix.filter(piece => piece.id === id)
+      .forEach(p => {
+        changePosition([...(boardMatrix.filter(piece => piece.id !== id)), {id: p.id, title: p.title, value: squarePosition}]);
+      })
+  }
 
   const handleDrop = (e) => {
-
     e.preventDefault();
-    e.stopPropagation();
-    const id = e.dataTransfer.getData('text')
-    // console.log(document.getElementById(id))
-    const piece = document.getElementById(id);
-    if(!(squareRef.current.children.children > 0)){
-      squareRef.current.appendChild(piece)
-    } 
-    // console.log(position)
-    // changePosition(allPositions.map(pos => (pos.value === piece.id ? pos.value: position)))
+
+    const id = e.dataTransfer.getData('text');
+
+    if((squareRef.current.children.length < 1)){
+      movePiece(id);
+    } else {
+      if((JSON.stringify(squareRef.current.children[0].tagName).includes("DIV"))
+        && !(squareRef.current.children[0].children.length < 1)) {
+          movePiece(id);
+      } else {
+        return null;
+    }}
+
+    // console.log(squareRef.current)
     e.dataTransfer.clearData();
   }
 
   const handleDragOver = (e) => {
     e.preventDefault();
-    e.stopPropagation();
-    // console.log(squareRef)
-    
-  }
-
-  const handleDragEnter = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    e.target.background = "green";
   }
 
   return (
-    <div 
+    <div
+      id={ID}
       ref={squareRef}
       style={{
         width: "12.5%",
         height: "12.5%",
         display: "inline-block",
-        marginBottom: "-4px",
-        backgroundColor: (tileColor === "white") ? "white" : "brown"
+        // marginBottom: "-4px",
+        backgroundColor: tileColor,
       }}
+      onDragStart={onDragStart}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
     >
-      {piece}
+      {boardMatrix.filter(pos => (JSON.stringify(squarePosition) === JSON.stringify(pos.value)))
+        .map(p => {
+            return(<Piece
+              color={(p.id.includes("w")) ? "white" : "black"} 
+              ID={p.id} 
+              name={p.title} 
+              key={p.id}
+              onDragStart={onDragStart}
+              position={p.value}
+            />)})}
     </div>
   )
 }
