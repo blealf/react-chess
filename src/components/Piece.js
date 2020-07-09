@@ -41,7 +41,6 @@ const Piece = ({ ID, name, color, onDragStart, position }) => {
           height: "100%",
           width: "100%",
           padding: "0px",
-          // border: "2px solid black"
         }}/>);
     return chosenPiece;
   }

@@ -23,15 +23,33 @@ const Square = ({
 
     const id = e.dataTransfer.getData('text');
 
-    if((squareRef.current.children.length < 1)){
-      movePiece(id);
+    // if((squareRef.current.children.length < 1)){
+    //   movePiece(id);
+    // } else {
+    //   if((JSON.stringify(squareRef.current.children[0].tagName).includes("DIV"))
+    //     && !(squareRef.current.children[0].children.length < 1)) {
+    //       movePiece(id);
+    //   } else {
+    //     return null;
+    // }}
+    // console.log(squareRef.current.children[0].className)
+
+    const dropIndicator = squareRef.current.children[0];
+    if (dropIndicator
+      && dropIndicator.className
+      && dropIndicator.className === "highlightedMove"){
+        movePiece(id);
     } else {
-      if((JSON.stringify(squareRef.current.children[0].tagName).includes("DIV"))
-        && !(squareRef.current.children[0].children.length < 1)) {
-          movePiece(id);
-      } else {
-        return null;
-    }}
+      // alert("cannot drop here")
+    }
+    
+
+    const elements = document.getElementsByClassName("highlightedMove")
+    console.log(elements)
+
+    while(elements.length > 0){
+      elements[0].parentNode.removeChild(elements[0]);
+    }
 
     // console.log(squareRef.current)
     e.dataTransfer.clearData();
@@ -52,7 +70,7 @@ const Square = ({
         // marginBottom: "-4px",
         backgroundColor: tileColor,
       }}
-      onDragStart={onDragStart}
+      // onDragStart={onDragStart}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
@@ -65,7 +83,10 @@ const Square = ({
               key={p.id}
               onDragStart={onDragStart}
               position={p.value}
-            />)})}
+            />)
+          }
+        )
+      }
     </div>
   )
 }

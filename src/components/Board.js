@@ -2,8 +2,15 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import Square from './Square';
 import chessPieces from '../data';
-
-import Piece from './Piece';
+import {
+  kingMove, 
+  // queenMove, 
+  // bishopMove, 
+  knightMove, 
+  rookMove, 
+  pawnMove, 
+  pawnKill
+} from './Movements';
 
 
 const BoardWrapper = styled.div`
@@ -17,6 +24,19 @@ const BoardWrapper = styled.div`
   // background: #1a202c;
 `;
 
+const highlightMove = styled.div`
+  margin: 0 auto;
+  height: 10px;
+  width: 10px;
+  border-radius: 5px;
+  background-color: "green";
+`;
+
+// console.log(kingMove([0,3]))
+// console.log(pawnMove([1,3], false, true))
+// console.log(pawnKill([1,3], true))
+// console.log(knightMove([2,3]))
+console.log(rookMove([3,3]));
 
 
 const Board = () => {
@@ -34,30 +54,35 @@ const Board = () => {
     let y = position[1]
     let canMove = []
     if (JSON.stringify(position) !== [0,0]||[0,7]||[7,0]||[7,7]){
-      canMove = [[x++, y++],[x--, y--]]
+      
+      canMove = [[x+1, y+1],[x+1, y-1],[x-1, y+1],[x-1,y-1]]
+      // console.log(canMove)
     }
+    // if (x === 0){
+
+    // }
     return canMove;
   }
   
-  const vertical = (position) => {
-    let x = position[0]
-    let y = position[1]
-    let canMove = []
-    if (JSON.stringify(position) !== [0,0]||[0,7]||[7,0]||[7,7]){
-      canMove = [[x++, y],[x, y++],[x--, y],[x, y--]]
-    }
-    return canMove;
-  }
+  // const vertical = (position) => {
+  //   let x = position[0]
+  //   let y = position[1]
+  //   let canMove = []
+  //   if (JSON.stringify(position) !== [0,0]||[0,7]||[7,0]||[7,7]){
+  //     canMove = [[x++, y],[x, y++],[x--, y],[x, y--]]
+  //   }
+  //   return canMove;
+  // }
   
-  const horizontal = (position) => {
-    let x = position[0]
-    let y = position[1]
-    let canMove = []
-    if (JSON.stringify(position) !== [0,0]||[0,7]||[7,0]||[7,7]){
-      canMove = [[x++, y],[x, y++],[x--, y],[x, y--]]
-    }
-    return canMove;
-  }
+  // const horizontal = (position) => {
+  //   let x = position[0]
+  //   let y = position[1]
+  //   let canMove = []
+  //   if (JSON.stringify(position) !== [0,0]||[0,7]||[7,0]||[7,7]){
+  //     canMove = [[x++, y],[x, y++],[x--, y],[x, y--]]
+  //   }
+  //   return canMove;
+  // }
 
   const onDragStart = (e) => {
     e.dataTransfer.setData('text', e.target.id);
@@ -65,6 +90,8 @@ const Board = () => {
     e.target.getAttribute("position").split(",").forEach(num => {
       piecePosition.push(parseInt(num))
     })
+
+    // console.log(piecePosition)
 
     determineDropLocation(piecePosition, e.currentTarget);
     // console.log(piecePosition);
@@ -107,13 +134,30 @@ const Board = () => {
   }
 
   const determineDropLocation = (getPos, square) => {
-      diagonal(getPos).filter(moves => 
-        checkedPattern.filter(pos => 
-          JSON.stringify(moves) === JSON.stringify(pos.props.position)
-        ).forEach(p => {
-          changeColor(p.props.position)
-        })
-      )
+   knightMove(getPos).forEach(move => {
+        let square = document.getElementById(JSON.stringify(move))
+        if(square && square.children.length < 1) {
+            // square.style.backgroundColor = "blue";
+            let element = document.createElement("div")
+            element.setAttribute("class", "highlightedMove")
+            // element.style.cssText = "margin: 0 auto; height: 10px; width: 10px; border-radius: 5px background-color: green;"
+            Object.assign(element.style, {
+              margin: "0 auto",
+              marginTop: "30px",
+              height: "20px",
+              width: "20px",
+              borderRadius: "5px",
+              backgroundColor: "green",
+            })
+
+            square.appendChild(element);
+
+
+
+            // console.log(highlightMove);
+            // console.log(element)
+          }
+      })
       // square.style.backgroundColor = "green";
   }
 
