@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import Piece from './Piece';
 
 const Square = ({
@@ -9,7 +9,7 @@ const Square = ({
   squarePosition,
   tileColor
 }) => {
-  var squareRef = React.useRef();
+  var squareRef = useRef();
   
   const movePiece = (id) => {
     boardMatrix.filter(piece => piece.id === id)
@@ -22,36 +22,38 @@ const Square = ({
     e.preventDefault();
 
     const id = e.dataTransfer.getData('text');
-
-    // if((squareRef.current.children.length < 1)){
-    //   movePiece(id);
-    // } else {
-    //   if((JSON.stringify(squareRef.current.children[0].tagName).includes("DIV"))
-    //     && !(squareRef.current.children[0].children.length < 1)) {
-    //       movePiece(id);
-    //   } else {
-    //     return null;
-    // }}
-    // console.log(squareRef.current.children[0].className)
+    const elements = document.getElementsByClassName("highlightedMove")
+    const killMove = document.getElementsByClassName("killMove")
 
     const dropIndicator = squareRef.current.children[0];
     if (dropIndicator
       && dropIndicator.className
       && dropIndicator.className === "highlightedMove"){
         movePiece(id);
-    } else {
-      // alert("cannot drop here")
-    }
+    } 
     
+    if(dropIndicator && killMove.length > 0){
 
-    const elements = document.getElementsByClassName("highlightedMove")
-    console.log(elements)
+      if (squareRef.current.getAttribute("class") === "killMove"){
+
+        while(killMove.length > 0){
+
+          if(killMove[0].getAttribute("ID") === squareRef.current.getAttribute("ID")){
+            killMove[0].removeChild(killMove[0].children[0]);
+          }
+          killMove[0].removeAttribute("class");
+        }
+        movePiece(id);
+      }
+    }
 
     while(elements.length > 0){
       elements[0].parentNode.removeChild(elements[0]);
     }
-
-    // console.log(squareRef.current)
+    while(killMove.length > 0){
+      killMove[0].removeAttribute("class", "killMove");
+    }
+    
     e.dataTransfer.clearData();
   }
 
@@ -73,6 +75,7 @@ const Square = ({
       // onDragStart={onDragStart}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
+      position={squarePosition}
     >
       {boardMatrix.filter(pos => (JSON.stringify(squarePosition) === JSON.stringify(pos.value)))
         .map(p => {

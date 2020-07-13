@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 // import styled from 'styled-components';
 import kingB from './images/kingB.svg';
 import queenB from './images/queenB.svg';
@@ -16,27 +16,33 @@ import pawnW from './images/pawnW.svg';
 
 const Piece = ({ ID, name, color, onDragStart, position }) => {
 
+  const pieceRef = useRef();
+
   const chosenPiece = (whitePiece, blackPiece) => {
     const chosenPiece = (color === "white") ? 
       (<img
+        ref={pieceRef}
         draggable
         onDragStart={onDragStart}
         id={ID} 
         src={whitePiece}
         alt={whitePiece}
         position={position}
+        name={name}
         style={{
           height: "100%",
           width: "100%",
           padding: "0px"
         }}/>) : 
-      (<img 
+      (<img
+        ref={pieceRef}
         draggable
         onDragStart={onDragStart}
         id={ID}
         src={blackPiece}
         alt={blackPiece}
         position={position}
+        name={name}
         style={{
           height: "100%",
           width: "100%",
