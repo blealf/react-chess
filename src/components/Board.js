@@ -46,7 +46,7 @@ const Board = () => {
     }
   ]);
 
-  var occupied = []
+  var occupied = [];
   // const [lastMove, setlastMove ] = useState([])
 
   useEffect(() => {
