@@ -1,17 +1,17 @@
 import React, { useRef } from 'react';
 // import styled from 'styled-components';
-import kingB from './images/kingB.svg';
-import queenB from './images/queenB.svg';
-import bishopB from './images/bishopB.svg';
-import knightB from './images/knightB.svg';
-import rookB from './images/rookB.svg';
-import pawnB from './images/pawnB.svg';
-import kingW from './images/kingW.svg';
-import queenW from './images/queenW.svg';
-import bishopW from './images/bishopW.svg';
-import knightW from './images/knightW.svg';
-import rookW from './images/rookW.svg';
-import pawnW from './images/pawnW.svg';
+import kingB from 'assets/images/kingB.svg';
+import queenB from 'assets/images/queenB.svg';
+import bishopB from 'assets/images/bishopB.svg';
+import knightB from 'assets/images/knightB.svg';
+import rookB from 'assets/images/rookB.svg';
+import pawnB from 'assets/images/pawnB.svg';
+import kingW from 'assets/images/kingW.svg';
+import queenW from 'assets/images/queenW.svg';
+import bishopW from 'assets/images/bishopW.svg';
+import knightW from 'assets/images/knightW.svg';
+import rookW from 'assets/images/rookW.svg';
+import pawnW from 'assets/images/pawnW.svg';
 
 
 const Piece = ({ ID, name, color, onDragStart, position }) => {

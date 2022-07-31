@@ -195,25 +195,34 @@ const pawnMove = (currentPosition, moved, fromTop, occupied) => {
     ((fromTop) ? 
       [[x, ((y+1 <= 7) ? y+1 : null)], [x, ((y+2 <= 7) ? y+2 : null)]] : 
       [[x, ((y-1 >= 0) ? y-1 : null)], [x, ((y-2 >= 0) ? y-2 : null)]]);
-
-  // console.log("before : " + newPositions)
-  // newPositions.filter(position => 
-  //   occupied.indexOf(JSON.stringify([position[1],position[0]])) >= 0
-  // )
+      // console.log("before : " + newPositions)
+  newPositions = newPositions.filter(position => {
+    // console.log(position)
+    return !occupied.includes(JSON.stringify([position[1], position[0]]))
+  })
+  pawnKill([x, y], fromTop).forEach((point) => {
+    if (occupied.includes(JSON.stringify([point[1], point[0]]))) {
+      // console.log(point)
+      newPositions.push(point);
+    }
+  })
+  // console.log(JSON.stringify(newPositions))
   // console.log("after : " + newPositions)
   return reversePositions(newPositions);
 }
 
 const pawnKill = (currentPosition, fromTop) => {
+  // console.log('currentPosition', currentPosition)
   let x = currentPosition[1]
   let y = currentPosition[0]
+  // console.log('x, y', x, y)
   
   let newPositions = (fromTop) ? 
     [[((x+1 <= 7) ? x+1 : null), ((y+1 <= 7) ? y+1 : null)],
-    [((x-1 >= 0) ? x-1 : null), ((y+1 <= 7) ? y+1 : null)]] 
+    [((x+1 <= 7) ? x+1 : null), ((y-1 >= 0) ? y-1 : null)]]
     :
-    [[((x+1 <= 7) ? x+1 : null), ((y-1 >= 0) ? y-1 : null)],
-    [((x-1 >= 0) ? x-1 : null), ((y-1 >= 0) ? y-1 : null)]]
+    [[((x-1 >= 0) ? x-1 : null), ((y+1 <= 7) ? y+1 : null)],
+    [((x-1 >= 0) ? x-1 : null), ((y-1 >= 0) ? y - 1 : null)]]
       
   return reversePositions(newPositions);
 }

@@ -11,7 +11,7 @@ import {
   knightMove,
   rookMove,
   pawnMove,
-  // pawnKill,
+  pawnKill,
 } from './Movements';
 
 const BoardWrapper = styled.div`
@@ -27,7 +27,7 @@ const BoardWrapper = styled.div`
 
 // console.log(kingMove([0,3]))
 // console.log(pawnMove([1,3], false, true))
-// console.log(pawnKill([1,3], true))
+console.log(pawnKill([0,1], true))
 // console.log(knightMove([2,3]))
 // console.log(rookMove([3,3]));
 // console.log(bishopMove([3,3]));
@@ -163,6 +163,7 @@ const Board = () => {
   }
 
   const determineDropLocation = (play, liftedPiece) => {
+    console.log(JSON.stringify(play))
     play.forEach(move => {
       let square = document.getElementById(JSON.stringify(move))
       if (square && square.children.length < 1) {
@@ -201,13 +202,14 @@ const Board = () => {
         const elements = document.getElementsByClassName
           ("highlightedMove")
         const killMove = document.getElementsByClassName("killMove")
-
-        while (elements.length > 0) {
-          elements[0].parentNode.removeChild(elements[0]);
-        }
-        while (killMove.length > 0) {
-          killMove[0].removeAttribute("class");
-        }
+        try {
+          while (elements.length > 0) {
+            elements[0].parentNode.removeChild(elements[0]);
+          }
+          while (killMove.length > 0) {
+            killMove[0].removeAttribute("class");
+          }
+        } catch(err) {}
       }}
     >
       {checkedPattern}
