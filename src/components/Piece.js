@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-// import styled from 'styled-components';
 import kingB from 'assets/images/kingB.svg';
 import queenB from 'assets/images/queenB.svg';
 import bishopB from 'assets/images/bishopB.svg';
@@ -15,7 +14,6 @@ import pawnW from 'assets/images/pawnW.svg';
 
 
 const Piece = ({ ID, name, color, onDragStart, position }) => {
-
   const pieceRef = useRef();
 
   const chosenPiece = (whitePiece, blackPiece) => {
@@ -29,6 +27,7 @@ const Piece = ({ ID, name, color, onDragStart, position }) => {
         alt={whitePiece}
         position={position}
         name={name}
+        data-piece={name+'W'}
         style={{
           height: "100%",
           width: "100%",
@@ -43,6 +42,7 @@ const Piece = ({ ID, name, color, onDragStart, position }) => {
         alt={blackPiece}
         position={position}
         name={name}
+        data-piece={name+'B'}
         style={{
           height: "100%",
           width: "100%",

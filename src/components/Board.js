@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-
 import styled from 'styled-components';
 import './style.css'
 import Square from './Square';
@@ -11,7 +10,6 @@ import {
   knightMove,
   rookMove,
   pawnMove,
-  pawnKill,
 } from './Movements';
 
 const BoardWrapper = styled.div`
@@ -27,7 +25,7 @@ const BoardWrapper = styled.div`
 
 // console.log(kingMove([0,3]))
 // console.log(pawnMove([1,3], false, true))
-console.log(pawnKill([0,1], true))
+// console.log(pawnKill([0,1], true))
 // console.log(knightMove([2,3]))
 // console.log(rookMove([3,3]));
 // console.log(bishopMove([3,3]));
@@ -35,9 +33,10 @@ console.log(pawnKill([0,1], true))
 // console.log(testMoves([3,3]));
 
 
-const Board = () => {
+const Board = ({ reset }) => {
 
   const initialPosition = chessPieces;
+  const [occupied, setOccupied] = useState([]);
   const [position, setPosition] = useState(initialPosition);
   const [moveColor, setMoveColor] = useState([
     {
@@ -45,26 +44,19 @@ const Board = () => {
       color: ""
     }
   ]);
+  const [blackKilled, setBlackKilled] = useState([]);
+  const [whiteKilled, setWhiteKilled] = useState([]);
+  const [whiteMoved, setWhiteMoved] = useState(false);
 
-  var occupied = [];
-  // const [lastMove, setlastMove ] = useState([])
 
   useEffect(() => {
-
+    setOccupied(position.map((p) => JSON.stringify(p.value)))
     // position.forEach(p => {
-    //   setlastMove([...lastMove, JSON.stringify(p.value)])
+    //   occupied.push(JSON.stringify(p.value))
     // })
+    console.log(blackKilled, whiteKilled)
 
-    position.forEach(p => {
-      occupied.push(JSON.stringify(p.value))
-    })
-    // console.log(lastMove)
-    // console.log(occupied)
-    // occupied.forEach(o => {
-    //   console.log(o)
-    // })
-
-  }, [position, occupied]);
+  }, [position, blackKilled, whiteKilled, reset]);
 
   const onDragStart = (e) => {
     e.dataTransfer.setData('text', e.target.id);
@@ -81,13 +73,6 @@ const Board = () => {
     return selectedColor;
   }
 
-  // const reStyleSquare = () => {
-  //   checkedPattern.forEach((cp) => {
-  //     let square = document.getElementById(cp.props.ID)
-  //     square.style.radius = null
-  //   })
-  // }
-
   var checkedPattern = [];
   var swap = false;
 
@@ -99,6 +84,9 @@ const Board = () => {
       squarePosition={currentPos}
       boardMatrix={position}
       onDragStart={onDragStart}
+      updateBlackKill={setBlackKilled}
+      updateWhiteKill={setWhiteKilled}
+      setWhiteMoved={setWhiteMoved}
       changePosition={setPosition}
       onChangeColor={(e) => changeColor(JSON.stringify(currentPos))}
     />)
@@ -116,7 +104,6 @@ const Board = () => {
       id === square.props.position
     ).forEach(color => {
       setMoveColor([...moveColor, { id: id, color: "green" }])
-      // console.log(color);
     })
   }
 
@@ -127,7 +114,11 @@ const Board = () => {
     let piece = liftedPiece.getAttribute("name")
     let pieceColor = liftedPiece.getAttribute("id").charAt(0);
     let moved = false;
-
+    const canMove =
+      (whiteMoved === false && pieceColor === "w") ||
+      (whiteMoved === true && pieceColor === "b")
+      
+    if (!canMove) return 
     liftedPiece.getAttribute("position").split(",").forEach(num => {
       piecePosition.push(parseInt(num))
     })
@@ -163,13 +154,11 @@ const Board = () => {
   }
 
   const determineDropLocation = (play, liftedPiece) => {
-    console.log(JSON.stringify(play))
     play.forEach(move => {
       let square = document.getElementById(JSON.stringify(move))
       if (square && square.children.length < 1) {
         let element = document.createElement("div")
         element.setAttribute("class", "highlightedMove")
-        // element.style.cssText = "margin: 0 auto; height: 10px; width: 10px; border-radius: 5px background-color: green;"
         Object.assign(element.style, {
           margin: "0 auto",
           marginTop: "30px",
@@ -184,16 +173,22 @@ const Board = () => {
         if (square && square.children.length > 0) {
           if(liftedPiece){
             if(liftedPiece.getAttribute("id").charAt(0) !== square.children[0].getAttribute("id").charAt(0)){
-              // console.log(liftedPiece.getAttribute("id"))
-              // console.log(square.children[0].getAttribute("id"))
               square.setAttribute('class', 'killMove');
             }
           }
         }
       }
     })
-    // square.style.backgroundColor = "green";
   }
+
+  const resetBoard = () => {
+    setPosition(initialPosition);
+    setOccupied([]);
+    setBlackKilled([]);
+    setWhiteKilled([]);
+    setWhiteMoved(false);
+  }
+
 
 
   return (

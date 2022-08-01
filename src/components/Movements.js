@@ -1,17 +1,13 @@
-// import React from 'react';
-
-
 const moveUp = (value, occupied) => {
   let x = value[1], y = value[0], newPoints = []
   while(y < 7) {
-    if(occupied.indexOf(JSON.stringify([y+1,x])) >= 0) { 
+    if(occupied.includes(JSON.stringify([y+1,x]))) { 
       newPoints.push([ x, y+1]);
       break;
     }
     newPoints.push([ x, y+1]);
     y++;
   }
-  // console.log(newPoints);
   return newPoints;
 }
 
@@ -19,7 +15,7 @@ const moveDown = (value, occupied) => {
   let x = value[1], y = value[0], newPoints = []
   while(y > 0) {
     if(occupied.indexOf(JSON.stringify([y-1,x])) >= 0) { 
-      // newPoints.push([ x, y-1])
+      newPoints.push([ x, y-1])
       break;
     }
     newPoints.push([ x, y-1])
@@ -32,7 +28,7 @@ const moveRight = (value, occupied) => {
   let x = value[1], y = value[0], newPoints = []
   while(x < 7) {
     if(occupied.indexOf(JSON.stringify([y,x+1])) >= 0) { 
-      // newPoints.push([ x+1, y])
+      newPoints.push([ x+1, y])
       break;
     }
     newPoints.push([ x+1, y])
@@ -45,7 +41,7 @@ const moveLeft = (value, occupied) => {
   let x = value[1], y = value[0], newPoints = []
   while(x > 0) {
     if(occupied.indexOf(JSON.stringify([y,x-1])) >= 0) { 
-      // newPoints.push([ x-1, y])
+      newPoints.push([ x-1, y])
       break;
     }
     newPoints.push([ x-1, y])
@@ -59,7 +55,10 @@ const moveLeftUp = (value, occupied) => {
   var y = value[0]
   let newPoints = []
   while((x > 0) & (y > 0)) {
-    if(occupied.indexOf(JSON.stringify([y-1,x-1])) >= 0) { break;}
+    if (occupied.indexOf(JSON.stringify([y - 1, x - 1])) >= 0) {
+      newPoints.push([ x-1, y-1]);
+      break;
+    }
     newPoints.push([ x-1, y-1]);
     x--; y--;
   }
@@ -71,7 +70,10 @@ const moveRightUp = (value, occupied) => {
   var y = value[0]
   let newPoints = []
   while((x < 7) & (y > 0)) {
-    if(occupied.indexOf(JSON.stringify([y-1,x+1])) >= 0) { break;}
+    if (occupied.indexOf(JSON.stringify([y - 1, x + 1])) >= 0) {
+      newPoints.push([ x+1, y-1]);
+      break;
+    }
     newPoints.push([ x+1, y-1]);
     x++; y--;
   }
@@ -83,7 +85,10 @@ const moveRightDown = (value, occupied) => {
   var y = value[0]
   let newPoints = []
   while((x < 7) & (y < 7)) {
-    if(occupied.indexOf(JSON.stringify([y+1,x+1])) >= 0) { break;}
+    if (occupied.indexOf(JSON.stringify([y + 1, x + 1])) >= 0) {
+      newPoints.push([ x+1, y+1]);
+      break;
+    }
     newPoints.push([ x+1, y+1]);
     x++; y++;
   }
@@ -95,7 +100,10 @@ const moveLeftDown = (value, occupied) => {
   var y = value[0]
   let newPoints = []
   while((x > 0) & (y < 7)) {
-    if(occupied.indexOf(JSON.stringify([y+1,x-1])) >= 0) { break;}
+    if (occupied.indexOf(JSON.stringify([y + 1, x - 1])) >= 0) {
+      newPoints.push([ x-1, y+1]);
+      break;
+    }
     newPoints.push([ x-1, y+1]);
     x--; y++;
   }
@@ -113,18 +121,16 @@ const reversePositions = (positionsArray) => {
 const kingMove = (currentPosition) => {
   let x = currentPosition[1]
   let y = currentPosition[0]
-  // console.log("x = " + x);
-  // console.log("y = " + y);
 
   let newPositions = [
-    [x, ((y+1 < 8) ? y+1 : null)],
-    [x, ((y-1 > 0) ? y-1 : null)],
+    [x, ((y+1 <= 7) ? y+1 : null)],
+    [x, ((y-1 >= 0) ? y-1 : null)],
     [((x+1 <= 7) ? x+1 : null), y],
-    [((x-1 > 0) ? x-1 : null), y],
-    [((x+1 <= 7) ? x+1 : null), ((y-1 > 0) ? y-1 : null)],
+    [((x-1 >= 0) ? x-1 : null), y],
+    [((x+1 <= 7) ? x+1 : null), ((y-1 >= 0) ? y-1 : null)],
     [((x+1 <= 7) ? x+1 : null), ((y+1 <= 7) ? y+1 : null)],
-    [((x-1 > 0) ? x-1 : null), ((y-1 > 0) ? y-1 : null)],
-    [((x-1 > 0) ? x-1 : null), ((y+1 <= 7) ? y+1 : null)],
+    [((x-1 >= 0) ? x-1 : null), ((y-1 >= 0) ? y-1 : null)],
+    [((x-1 >= 0) ? x-1 : null), ((y+1 <= 7) ? y+1 : null)],
   ];
   
   return reversePositions(newPositions);
@@ -195,27 +201,20 @@ const pawnMove = (currentPosition, moved, fromTop, occupied) => {
     ((fromTop) ? 
       [[x, ((y+1 <= 7) ? y+1 : null)], [x, ((y+2 <= 7) ? y+2 : null)]] : 
       [[x, ((y-1 >= 0) ? y-1 : null)], [x, ((y-2 >= 0) ? y-2 : null)]]);
-      // console.log("before : " + newPositions)
   newPositions = newPositions.filter(position => {
-    // console.log(position)
     return !occupied.includes(JSON.stringify([position[1], position[0]]))
   })
   pawnKill([x, y], fromTop).forEach((point) => {
     if (occupied.includes(JSON.stringify([point[1], point[0]]))) {
-      // console.log(point)
       newPositions.push(point);
     }
   })
-  // console.log(JSON.stringify(newPositions))
-  // console.log("after : " + newPositions)
   return reversePositions(newPositions);
 }
 
 const pawnKill = (currentPosition, fromTop) => {
-  // console.log('currentPosition', currentPosition)
   let x = currentPosition[1]
   let y = currentPosition[0]
-  // console.log('x, y', x, y)
   
   let newPositions = (fromTop) ? 
     [[((x+1 <= 7) ? x+1 : null), ((y+1 <= 7) ? y+1 : null)],

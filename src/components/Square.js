@@ -7,15 +7,19 @@ const Square = ({
   ID,
   onDragStart,
   squarePosition,
-  tileColor
+  tileColor,
+  updateBlackKill,
+  updateWhiteKill,
+  setWhiteMoved,
 }) => {
-  var squareRef = useRef();
+  const squareRef = useRef();
   
   const movePiece = (id) => {
     boardMatrix.filter(piece => piece.id === id)
       .forEach(p => {
         changePosition([...(boardMatrix.filter(piece => piece.id !== id)), {id: p.id, title: p.title, value: squarePosition}]);
       })
+    setWhiteMoved((whiteMoved) => !whiteMoved)
   }
 
   const handleDrop = (e) => {
@@ -24,8 +28,8 @@ const Square = ({
     const id = e.dataTransfer.getData('text');
     const elements = document.getElementsByClassName("highlightedMove")
     const killMove = document.getElementsByClassName("killMove")
-
     const dropIndicator = squareRef.current.children[0];
+
     if (dropIndicator
       && dropIndicator.className
       && dropIndicator.className === "highlightedMove"){
@@ -33,12 +37,15 @@ const Square = ({
     } 
     
     if(dropIndicator && killMove.length > 0){
-
       if (squareRef.current.getAttribute("class") === "killMove"){
-
         while(killMove.length > 0){
-
-          if(killMove[0].getAttribute("ID") === squareRef.current.getAttribute("ID")){
+          if (killMove[0].getAttribute("ID") === squareRef.current.getAttribute("ID")) {
+            const piece = killMove[0].children[0].getAttribute("data-piece")
+            if (piece.charAt(piece.length - 1) === "W") {
+              updateWhiteKill((val) => ([...val, piece]))
+            } else {
+              updateBlackKill((val) => ([...val, piece]))
+            }     
             killMove[0].removeChild(killMove[0].children[0]);
           }
           killMove[0].removeAttribute("class");
@@ -69,10 +76,8 @@ const Square = ({
         width: "12.5%",
         height: "12.5%",
         display: "inline-block",
-        // marginBottom: "-4px",
         backgroundColor: tileColor,
       }}
-      // onDragStart={onDragStart}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       position={squarePosition}
@@ -83,6 +88,7 @@ const Square = ({
               color={(p.id.includes("w")) ? "white" : "black"} 
               ID={p.id} 
               name={p.title} 
+              info={p.title + p.id.includes("w") ? "W" : "B" }
               key={p.id}
               onDragStart={onDragStart}
               position={p.value}
@@ -95,5 +101,3 @@ const Square = ({
 }
 
 export default Square
-
-// style={{width: {width}, height: {height}, background: {color}, display: "inline"}}
