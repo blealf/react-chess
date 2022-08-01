@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import './style.css'
 import Square from './Square';
@@ -10,7 +10,9 @@ import {
   knightMove,
   rookMove,
   pawnMove,
-} from './Movements';
+} from 'utils/Movements';
+import { useDispatch } from 'react-redux'
+import { updateKilled } from 'features/GameSlice'
 
 const BoardWrapper = styled.div`
   margin: 0 auto;
@@ -47,16 +49,18 @@ const Board = ({ reset }) => {
   const [blackKilled, setBlackKilled] = useState([]);
   const [whiteKilled, setWhiteKilled] = useState([]);
   const [whiteMoved, setWhiteMoved] = useState(false);
+  const dispatch = useDispatch()
 
+  const updateKilledPieces = useCallback(() => {
+    console.log(blackKilled, whiteKilled)
+    dispatch(updateKilled({ blackKilled, whiteKilled}))
+  }, [blackKilled, whiteKilled, dispatch])
 
   useEffect(() => {
     setOccupied(position.map((p) => JSON.stringify(p.value)))
-    // position.forEach(p => {
-    //   occupied.push(JSON.stringify(p.value))
-    // })
-    console.log(blackKilled, whiteKilled)
+    updateKilledPieces()
 
-  }, [position, blackKilled, whiteKilled, reset]);
+  }, [position, updateKilledPieces]);
 
   const onDragStart = (e) => {
     e.dataTransfer.setData('text', e.target.id);
