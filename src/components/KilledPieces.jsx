@@ -14,7 +14,6 @@ const KilledPieces = () => {
   const killed = useSelector((store) => store.game.killed)
   
   useEffect(() => {
-    // console.log('KilledPieces', killed)
     setBlackKilled(killed.blackKilled)
     setWhiteKilled(killed.whiteKilled)
   }, [killed])

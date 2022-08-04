@@ -2,12 +2,13 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
   positions: [],
-  savedPositions: {},
+  savedPositions: [],
   occupied: [],
   killed: {
     blackKilled: [],
     whiteKilled: [],
-  }
+  },
+  // allMoves: [],
 }
 const GameSlice = createSlice({
   name: 'game',
@@ -18,6 +19,14 @@ const GameSlice = createSlice({
       console.log(blackKilled, whiteKilled)
       state.killed['blackKilled'] = blackKilled
       state.killed['whiteKilled'] = whiteKilled
+    },
+    undo(state, action) {
+      const { index } = action.payload
+      state.positions = state.savedPositions[index]
+    },
+    redo(state, action) {
+      const { index } = action.payload
+      state.positions = state.savedPositions[index]
     }
   }
 })
