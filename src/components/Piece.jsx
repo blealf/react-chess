@@ -31,7 +31,8 @@ const Piece = ({ ID, name, color, onDragStart, position }) => {
         style={{
           height: "100%",
           width: "100%",
-          padding: "0px"
+          padding: "0px",
+          transition: "all 0.5s ease-in-out"
         }}/>) : 
       (<img
         ref={pieceRef}
@@ -47,6 +48,7 @@ const Piece = ({ ID, name, color, onDragStart, position }) => {
           height: "100%",
           width: "100%",
           padding: "0px",
+          transition: "all 0.5s ease-in-out"
         }}/>);
     return chosenPiece;
   }

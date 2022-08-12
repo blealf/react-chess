@@ -11,15 +11,17 @@ const Square = ({
   updateBlackKill,
   updateWhiteKill,
   setWhiteMoved,
+  simulate,
 }) => {
   const squareRef = useRef();
   
-  const movePiece = (id) => {
+  const movePiece = async (id) => {
     boardMatrix.filter(piece => piece.id === id)
       .forEach(p => {
         changePosition([...(boardMatrix.filter(piece => piece.id !== id)), {id: p.id, title: p.title, value: squarePosition}]);
       })
-    setWhiteMoved((whiteMoved) => !whiteMoved)
+    await setWhiteMoved((whiteMoved) => !whiteMoved)
+    simulate()
   }
 
   const handleDrop = (e) => {
@@ -74,7 +76,7 @@ const Square = ({
       ref={squareRef}
       style={{
         width: "12.5%",
-        height: "12.5%",
+        height: "12.15%",
         display: "inline-block",
         backgroundColor: tileColor,
       }}

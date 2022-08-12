@@ -2,3 +2,7 @@
   outline: 10px solid green;
   outline-offset: -10px;
 }
+.threatened {
+  outline: 10px solid red;
+  outline-offset: -10px;
+}

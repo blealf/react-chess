@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
 import styled from 'styled-components';
 import './style.css'
 import Square from './Square';
 import chessPieces from '../data';
-import {
+import moves, {
   kingMove,
   queenMove,
   bishopMove,
@@ -18,15 +18,17 @@ const BoardWrapper = styled.div`
   margin: 0 auto;
   width: 700px;
   height: 700px;
-  border: 1px solid black;
+  margin-bottom: -10px;
+  border: 1px solid teal;
   transform: rotateY(-10deg) rotateX(20deg);
   -webkit-transform: rotateY(-10deg) rotateX(25deg);
-  box-shadow: 50px 50px 205px #1a202c, 0 1px 40px teal;
+  box-shadow: 10px 10px 50px #1a202c, 0 1px 40px teal;
+  transition: transform 1s ease-in-out;
   // background: #1a202c;
 `;
 
 // console.log(kingMove([0,3]))
-// console.log(pawnMove([1,3], false, true))
+// console.log(pawnMove([1,3], false, true, ["[1,2]"]))
 // console.log(pawnKill([0,1], true))
 // console.log(knightMove([2,3]))
 // console.log(rookMove([3,3]));
@@ -49,12 +51,30 @@ const Board = ({ reset }) => {
   const [blackKilled, setBlackKilled] = useState([]);
   const [whiteKilled, setWhiteKilled] = useState([]);
   const [whiteMoved, setWhiteMoved] = useState(false);
+  const [kingPosition, setKingPosition] = useState({
+    white: initialPosition.find((piece) => piece.id === "wk1").value,
+    black: initialPosition.find((piece) => piece.id === "wk1").value
+  });
   const dispatch = useDispatch()
+  const boardRef = useRef(null);
+  const [firstUpdate, setFirstUpdate] = useState(true);
 
   const updateKilledPieces = useCallback(() => {
     console.log(blackKilled, whiteKilled)
     dispatch(updateKilled({ blackKilled, whiteKilled}))
   }, [blackKilled, whiteKilled, dispatch])
+
+
+  useLayoutEffect(() => {
+    console.log(firstUpdate, whiteMoved)
+    if (firstUpdate && whiteMoved === false) {
+      setFirstUpdate(false);
+      return;
+    }
+    setTimeout(() => {
+      flipBoard(whiteMoved ? "black" : "white");
+    }, 100);
+  }, [whiteMoved])
 
   useEffect(() => {
     setOccupied(position.map((p) => JSON.stringify(p.value)))
@@ -65,6 +85,37 @@ const Board = ({ reset }) => {
   const onDragStart = (e) => {
     e.dataTransfer.setData('text', e.target.id);
     playPiece(e.target);
+  }
+
+  const simulate = () => {
+    const allMoves = [];
+    position.filter((pos) =>
+      pos.title !== 'king' && pos.id.charAt(0) !== `${whiteMoved ? 'w' : 'b'}`)
+      .forEach((piece) => {
+        if (piece.title === 'pawn') {
+          let moved = false
+          if (((piece.value[0] > 1) && piece.id.charAt(0) === "b") ||
+            (((piece.value[0] < 6) && piece.id.charAt(0) === "w"))) {
+            moved = true
+          }
+          allMoves.push(...pawnMove(piece.value, moved, (piece.id.charAt(0) === "b"), occupied))
+          console.log(`${piece.id}:`, pawnMove(piece.value, moved, (piece.id.charAt(0) === "b"), occupied))
+        }
+        else {
+          allMoves.push(...moves[`${piece.title}Move`]((piece.value), occupied))
+          console.log(`${piece.id}`, moves[`${piece.title}Move`]((piece.value), occupied))
+        }
+      }
+    )
+    // console.log(allMoves)
+    let threatened = Array.from(position.find(pos => pos.id === `${whiteMoved ? "w" : "b"}k1`)?.value)
+    threatened = !whiteMoved ? threatened.reverse() : threatened
+    console.log('threatened',threatened)
+    if (allMoves.find((move) => JSON.stringify(move) === JSON.stringify(threatened))) {
+      console.log("FOUND")
+      document.getElementById(`${whiteMoved ? 'w' : 'b'}k1`).setAttribute("class", "threatened")
+      console.log(whiteMoved ? document.getElementById("wk1").style : document.getElementById("bk1").style)
+    }
   }
 
   const setColor = (id, color) => {
@@ -92,6 +143,7 @@ const Board = ({ reset }) => {
       updateWhiteKill={setWhiteKilled}
       setWhiteMoved={setWhiteMoved}
       changePosition={setPosition}
+      simulate={simulate}
       onChangeColor={(e) => changeColor(JSON.stringify(currentPos))}
     />)
   }
@@ -106,7 +158,7 @@ const Board = ({ reset }) => {
   const changeColor = (id) => {
     checkedPattern.filter(square =>
       id === square.props.position
-    ).forEach(color => {
+    ).forEach(() => {
       setMoveColor([...moveColor, { id: id, color: "green" }])
     })
   }
@@ -116,7 +168,7 @@ const Board = ({ reset }) => {
     let canPlay = []
     let piecePosition = []
     let piece = liftedPiece.getAttribute("name")
-    let pieceColor = liftedPiece.getAttribute("id").charAt(0);
+    let pieceColor = liftedPiece.getAttribute("id").charAt(0)
     let moved = false;
     const canMove =
       (whiteMoved === false && pieceColor === "w") ||
@@ -149,7 +201,9 @@ const Board = ({ reset }) => {
         canPlay = rookMove(piecePosition, occupied)
         break;
       case "pawn":
-        canPlay = (pieceColor === "b") ? pawnMove(piecePosition, moved, true, occupied) : pawnMove(piecePosition, moved, false, occupied)
+        canPlay = (pieceColor === "b") ?
+          pawnMove(piecePosition, moved, true, occupied) :
+          pawnMove(piecePosition, moved, false, occupied)
         break;
       default:
     }
@@ -176,7 +230,7 @@ const Board = ({ reset }) => {
       else {
         if (square && square.children.length > 0) {
           if(liftedPiece){
-            if(liftedPiece.getAttribute("id").charAt(0) !== square.children[0].getAttribute("id").charAt(0)){
+            if(liftedPiece.getAttribute("id")?.charAt(0) !== square.children[0].getAttribute("id")?.charAt(0)){
               square.setAttribute('class', 'killMove');
             }
           }
@@ -191,28 +245,57 @@ const Board = ({ reset }) => {
     setBlackKilled([]);
     setWhiteKilled([]);
     setWhiteMoved(false);
+    flipBoard("white");
+  }
+
+  const flipBoard = (color) => {
+    if (color === "white" || boardRef.current.style.transform.includes('170')) {
+      boardRef.current.style.transform = 'rotateY(-10deg) rotateX(20deg)'
+      boardRef.current.childNodes.forEach((child) => {
+        if (child.children[0]) {
+          child.children[0].style.transform = "rotate(0deg)"
+        }
+      });
+    } else {
+      boardRef.current.style.transform = "rotateY(170deg) rotateX(160deg)";
+      boardRef.current.childNodes.forEach((child) => {
+        if (child.children[0]) {
+          child.children[0].style.transform = "rotate(180deg)"
+        }
+      });
+    }
+    // setPosition(position.map(pos => ({ ...pos, value: [7 - pos.value[0], 7 - pos.value[1]] })))
   }
 
 
 
+
   return (
-    <BoardWrapper
-      onMouseLeave={(e) => {
-        const elements = document.getElementsByClassName
-          ("highlightedMove")
-        const killMove = document.getElementsByClassName("killMove")
-        try {
-          while (elements.length > 0) {
-            elements[0].parentNode.removeChild(elements[0]);
-          }
-          while (killMove.length > 0) {
-            killMove[0].removeAttribute("class");
-          }
-        } catch(err) {}
-      }}
-    >
-      {checkedPattern}
-    </BoardWrapper>
+    <>
+      <div className="board">
+        <button onClick={simulate}>Simulate</button>
+        <button onClick={resetBoard}>Reset</button>
+        <button onClick={flipBoard}>Flip</button>
+      </div>
+      <BoardWrapper
+        ref={boardRef}
+        onMouseLeave={(e) => {
+          const elements = document.getElementsByClassName
+            ("highlightedMove")
+          const killMove = document.getElementsByClassName("killMove")
+          try {
+            while (elements.length > 0) {
+              elements[0].parentNode.removeChild(elements[0]);
+            }
+            while (killMove.length > 0) {
+              killMove[0].removeAttribute("class");
+            }
+          } catch(err) {}
+        }}
+      >
+        {checkedPattern}
+      </BoardWrapper>
+    </>
   )
 }
 
