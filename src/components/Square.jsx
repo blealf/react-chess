@@ -20,7 +20,7 @@ const Square = ({
       .forEach(p => {
         changePosition([...(boardMatrix.filter(piece => piece.id !== id)), {id: p.id, title: p.title, value: squarePosition}]);
       })
-    await setWhiteMoved((whiteMoved) => !whiteMoved)
+    await setWhiteMoved()
     simulate()
   }
 
@@ -44,9 +44,9 @@ const Square = ({
           if (killMove[0].getAttribute("ID") === squareRef.current.getAttribute("ID")) {
             const piece = killMove[0].children[0].getAttribute("data-piece")
             if (piece.charAt(piece.length - 1) === "W") {
-              updateWhiteKill((val) => ([...val, piece]))
+              updateWhiteKill(piece)
             } else {
-              updateBlackKill((val) => ([...val, piece]))
+              updateBlackKill(piece)
             }     
             killMove[0].removeChild(killMove[0].children[0]);
           }

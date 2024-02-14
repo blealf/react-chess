@@ -34,4 +34,4 @@ const chessPieces = [
   { id: "wp8", title: "pawn", value: [6,7], moved: false},
 ]
 
-export default chessPieces 
+export { chessPieces }

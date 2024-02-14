@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
+import React, { useEffect, useCallback, useRef, useLayoutEffect, useReducer } from 'react';
 import styled from 'styled-components';
 import './style.css'
 import Square from './Square';
-import chessPieces from '../data';
-import moves, {
+import { chessPieces } from '../data';
+import {
   kingMove,
   queenMove,
   bishopMove,
@@ -13,6 +13,7 @@ import moves, {
 } from 'utils/Movements';
 import { useDispatch } from 'react-redux'
 import { updateKilled } from 'features/GameSlice'
+import { simulate } from 'utils/simulate';
 
 const BoardWrapper = styled.div`
   margin: 0 auto;
@@ -35,49 +36,92 @@ const BoardWrapper = styled.div`
 // console.log(bishopMove([3,3]));
 // console.log(queenMove([3,3]));
 // console.log(testMoves([3,3]));
+const initialPosition = chessPieces
+const initialState = {
+  occupied: [],
+  position: initialPosition,
+  moveColor: [{
+    id: '',
+    color: ''
+  }],
+  whiteKilled: [],
+  blackKilled: [],
+  whiteMoved: false,
+  kingPosition: {
+    white: initialPosition.find((piece) => piece.id === "wk1").value,
+    black: initialPosition.find((piece) => piece.id === "wk1").value
+  },
+  firstUpdate: true
+}
 
+const boardReducer = (state, action) => {
+  switch (action.type) {
+    case 'SET_OCCUPIED':
+      return { ...state, occupied: action.payload }
+    case 'SET_POSITION':
+      return { ...state, position: action.payload }
+    case 'SET_MOVE_COLOR':
+      return { ...state, moveColor: action.payload }
+    case 'SET_BLACK_KILLED':
+      return { ...state, blackKilled: action.payload }
+    case 'SET_WHITE_KILLED':
+      return { ...state, whiteKilled: action.payload }
+    case 'SET_WHITE_MOVED':
+      return { ...state, whiteMoved: action.payload }
+    case 'SET_KING_POSITION':
+      return { ...state, kingPosition: action.payload }
+    case 'SET_FIRST_UPDATE':
+      return { ...state, firstUpdate: action.payload }
+    case 'RESET':
+      return initialState
+    default:
+      return state
+  }
+}
 
 const Board = ({ reset }) => {
 
-  const initialPosition = chessPieces;
-  const [occupied, setOccupied] = useState([]);
-  const [position, setPosition] = useState(initialPosition);
-  const [moveColor, setMoveColor] = useState([
-    {
-      id: "",
-      color: ""
-    }
-  ]);
-  const [blackKilled, setBlackKilled] = useState([]);
-  const [whiteKilled, setWhiteKilled] = useState([]);
-  const [whiteMoved, setWhiteMoved] = useState(false);
-  const [kingPosition, setKingPosition] = useState({
-    white: initialPosition.find((piece) => piece.id === "wk1").value,
-    black: initialPosition.find((piece) => piece.id === "wk1").value
-  });
-  const dispatch = useDispatch()
-  const boardRef = useRef(null);
-  const [firstUpdate, setFirstUpdate] = useState(true);
+  const checkedPattern = [];
+  var swap = false;
 
+  const [{
+    occupied,
+    position,
+    moveColor,
+    whiteKilled,
+    blackKilled,
+    whiteMoved,
+    kingPosition,
+    firstUpdate,
+  }, dispatch] = useReducer(boardReducer, initialState)
+
+  const storeDispatch = useDispatch()
+  const boardRef = useRef(null);
   const updateKilledPieces = useCallback(() => {
     console.log(blackKilled, whiteKilled)
-    dispatch(updateKilled({ blackKilled, whiteKilled}))
-  }, [blackKilled, whiteKilled, dispatch])
+    storeDispatch(updateKilled({ blackKilled: blackKilled, whiteKilled: whiteKilled}))
+  }, [blackKilled, whiteKilled, storeDispatch])
 
 
-  useLayoutEffect(() => {
-    console.log(firstUpdate, whiteMoved)
-    if (firstUpdate && whiteMoved === false) {
-      setFirstUpdate(false);
-      return;
-    }
-    setTimeout(() => {
-      flipBoard(whiteMoved ? "black" : "white");
-    }, 100);
-  }, [whiteMoved])
+  // useLayoutEffect(() => {
+  //   console.log(firstUpdate, whiteMoved)
+  //   if (firstUpdate && whiteMoved === false) {
+  //     dispatch({
+  //       type: 'SET_FIRST_UPDATE',
+  //       payload: false,
+  //     });
+  //     return;
+  //   }
+  //   setTimeout(() => {
+  //     flipBoard(whiteMoved ? "black" : "white");
+  //   }, 100);
+  // }, [whiteMoved, firstUpdate])
 
   useEffect(() => {
-    setOccupied(position.map((p) => JSON.stringify(p.value)))
+    dispatch({
+      type: 'SET_OCCUPIED',
+      payload: position.map((p) => JSON.stringify(p.value))
+    })
     updateKilledPieces()
 
   }, [position, updateKilledPieces]);
@@ -85,37 +129,6 @@ const Board = ({ reset }) => {
   const onDragStart = (e) => {
     e.dataTransfer.setData('text', e.target.id);
     playPiece(e.target);
-  }
-
-  const simulate = () => {
-    const allMoves = [];
-    position.filter((pos) =>
-      pos.title !== 'king' && pos.id.charAt(0) !== `${whiteMoved ? 'w' : 'b'}`)
-      .forEach((piece) => {
-        if (piece.title === 'pawn') {
-          let moved = false
-          if (((piece.value[0] > 1) && piece.id.charAt(0) === "b") ||
-            (((piece.value[0] < 6) && piece.id.charAt(0) === "w"))) {
-            moved = true
-          }
-          allMoves.push(...pawnMove(piece.value, moved, (piece.id.charAt(0) === "b"), occupied))
-          console.log(`${piece.id}:`, pawnMove(piece.value, moved, (piece.id.charAt(0) === "b"), occupied))
-        }
-        else {
-          allMoves.push(...moves[`${piece.title}Move`]((piece.value), occupied))
-          console.log(`${piece.id}`, moves[`${piece.title}Move`]((piece.value), occupied))
-        }
-      }
-    )
-    // console.log(allMoves)
-    let threatened = Array.from(position.find(pos => pos.id === `${whiteMoved ? "w" : "b"}k1`)?.value)
-    threatened = !whiteMoved ? threatened.reverse() : threatened
-    console.log('threatened',threatened)
-    if (allMoves.find((move) => JSON.stringify(move) === JSON.stringify(threatened))) {
-      console.log("FOUND")
-      document.getElementById(`${whiteMoved ? 'w' : 'b'}k1`).setAttribute("class", "threatened")
-      console.log(whiteMoved ? document.getElementById("wk1").style : document.getElementById("bk1").style)
-    }
   }
 
   const setColor = (id, color) => {
@@ -128,9 +141,7 @@ const Board = ({ reset }) => {
     return selectedColor;
   }
 
-  var checkedPattern = [];
-  var swap = false;
-
+  
   const createPattern = (color, currentPos) => {
     checkedPattern.push(<Square
       tileColor={setColor(JSON.stringify(currentPos), color)}
@@ -139,11 +150,11 @@ const Board = ({ reset }) => {
       squarePosition={currentPos}
       boardMatrix={position}
       onDragStart={onDragStart}
-      updateBlackKill={setBlackKilled}
-      updateWhiteKill={setWhiteKilled}
-      setWhiteMoved={setWhiteMoved}
-      changePosition={setPosition}
-      simulate={simulate}
+      updateBlackKill={(val) => dispatch({ type: 'SET_BLACK_KILLED', payload: [...blackKilled, val]})}
+      updateWhiteKill={(val) => dispatch({ type: 'SET_WHITE_KILLED', payload: [...whiteKilled, val]})}
+      setWhiteMoved={() => dispatch({ type: 'SET_WHITE_MOVED', payload: !whiteMoved})}
+      changePosition={(val) => dispatch({ type: 'SET_POSITION', payload: val})}
+      simulate={() => simulate({ position, whiteMoved, occupied })}
       onChangeColor={(e) => changeColor(JSON.stringify(currentPos))}
     />)
   }
@@ -159,7 +170,10 @@ const Board = ({ reset }) => {
     checkedPattern.filter(square =>
       id === square.props.position
     ).forEach(() => {
-      setMoveColor([...moveColor, { id: id, color: "green" }])
+      dispatch({ 
+        type: 'SET_MOVE_COLOR', 
+        payload: [...moveColor, { id: id, color: "green" }]
+      })
     })
   }
 
@@ -240,11 +254,7 @@ const Board = ({ reset }) => {
   }
 
   const resetBoard = () => {
-    setPosition(initialPosition);
-    setOccupied([]);
-    setBlackKilled([]);
-    setWhiteKilled([]);
-    setWhiteMoved(false);
+    dispatch({ type: 'RESET' })
     flipBoard("white");
   }
 
@@ -267,31 +277,30 @@ const Board = ({ reset }) => {
     // setPosition(position.map(pos => ({ ...pos, value: [7 - pos.value[0], 7 - pos.value[1]] })))
   }
 
-
-
+  const handleBoardUpdate = () => {
+    const elements = document.getElementsByClassName
+      ("highlightedMove")
+    const killMove = document.getElementsByClassName("killMove")
+    try {
+      while (elements.length > 0) {
+        elements[0].parentNode.removeChild(elements[0]);
+      }
+      while (killMove.length > 0) {
+        killMove[0].removeAttribute("class");
+      }
+    } catch(err) {}
+  }
 
   return (
     <>
       <div className="board">
-        <button onClick={simulate}>Simulate</button>
+        <button onClick={() => simulate({ position, whiteMoved, occupied })}>Simulate</button>
         <button onClick={resetBoard}>Reset</button>
         <button onClick={flipBoard}>Flip</button>
       </div>
       <BoardWrapper
         ref={boardRef}
-        onMouseLeave={(e) => {
-          const elements = document.getElementsByClassName
-            ("highlightedMove")
-          const killMove = document.getElementsByClassName("killMove")
-          try {
-            while (elements.length > 0) {
-              elements[0].parentNode.removeChild(elements[0]);
-            }
-            while (killMove.length > 0) {
-              killMove[0].removeAttribute("class");
-            }
-          } catch(err) {}
-        }}
+        onMouseLeave={handleBoardUpdate}
       >
         {checkedPattern}
       </BoardWrapper>
