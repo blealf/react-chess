@@ -1,6 +1,18 @@
 import React, { useRef } from 'react';
 import Piece from './Piece';
 
+type SquareProps = {
+  boardMatrix: any
+  changePosition: any
+  ID: string
+  onDragStart: any
+  squarePosition: number[]
+  tileColor: string
+  updateBlackKill: any
+  updateWhiteKill: any
+  setWhiteMoved: any
+  simulate: any
+}
 const Square = ({
   boardMatrix,
   changePosition,
@@ -12,12 +24,12 @@ const Square = ({
   updateWhiteKill,
   setWhiteMoved,
   simulate,
-}) => {
+}: SquareProps) => {
   const squareRef = useRef();
   
-  const movePiece = async (id) => {
-    boardMatrix.filter(piece => piece.id === id)
-      .forEach(p => {
+  const movePiece = async (id: string) => {
+    boardMatrix.filter((piece: { id: string}) => piece.id === id)
+      .forEach((p: any) => {
         changePosition([...(boardMatrix.filter(piece => piece.id !== id)), {id: p.id, title: p.title, value: squarePosition}]);
       })
     await setWhiteMoved()

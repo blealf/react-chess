@@ -79,10 +79,10 @@ const boardReducer = (state, action) => {
   }
 }
 
-const Board = ({ reset }) => {
+const Board = () => {
 
   const checkedPattern = [];
-  var swap = false;
+  let swap = false;
 
   const [{
     occupied,
@@ -179,9 +179,9 @@ const Board = ({ reset }) => {
   const playPiece = (liftedPiece) => {
 
     let canPlay = []
-    let piecePosition = []
-    let piece = liftedPiece.getAttribute("name")
-    let pieceColor = liftedPiece.getAttribute("id").charAt(0)
+    const piecePosition = []
+    const piece = liftedPiece.getAttribute("name")
+    const pieceColor = liftedPiece.getAttribute("id").charAt(0)
     let moved = false;
     const canMove =
       (whiteMoved === false && pieceColor === "w") ||
@@ -226,9 +226,9 @@ const Board = ({ reset }) => {
 
   const determineDropLocation = (play, liftedPiece) => {
     play.forEach(move => {
-      let square = document.getElementById(JSON.stringify(move))
+      const square = document.getElementById(JSON.stringify(move))
       if (square && square.children.length < 1) {
-        let element = document.createElement("div")
+        const element = document.createElement("div")
         element.setAttribute("class", "highlightedMove")
         Object.assign(element.style, {
           margin: "0 auto",
@@ -277,8 +277,7 @@ const Board = ({ reset }) => {
   }
 
   const handleBoardUpdate = () => {
-    const elements = document.getElementsByClassName
-      ("highlightedMove")
+    const elements = document.getElementsByClassName("highlightedMove")
     const killMove = document.getElementsByClassName("killMove")
     try {
       while (elements.length > 0) {

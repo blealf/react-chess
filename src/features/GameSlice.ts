@@ -1,6 +1,19 @@
 import { createSlice } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit'
+import { ChessPieceType } from '../types/types'
 
-const initialState = {
+type KilledType = {
+  blackKilled: ChessPieceType[]
+  whiteKilled: ChessPieceType[]
+}
+interface InitialStateType {
+  positions: ChessPieceType | [],
+  savedPositions: ChessPieceType[] | [],
+  occupied: ChessPieceType[],
+  killed: KilledType,
+  allMoves?: number[][],
+}
+const initialState: InitialStateType = {
   positions: [],
   savedPositions: [],
   occupied: [],
@@ -14,17 +27,17 @@ const GameSlice = createSlice({
   name: 'game',
   initialState,
   reducers: {
-    updateKilled(state, action) {
+    updateKilled(state: InitialStateType, action: PayloadAction<KilledType>) {
       const { blackKilled, whiteKilled } = action.payload
       // console.log(blackKilled, whiteKilled)
       state.killed['blackKilled'] = blackKilled
       state.killed['whiteKilled'] = whiteKilled
     },
-    undo(state, action) {
+    undo(state: InitialStateType, action: PayloadAction<{index: number}>) {
       const { index } = action.payload
       state.positions = state.savedPositions[index]
     },
-    redo(state, action) {
+    redo(state: InitialStateType, action: PayloadAction<{index: number}>) {
       const { index } = action.payload
       state.positions = state.savedPositions[index]
     }

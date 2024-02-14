@@ -1,8 +1,6 @@
-import React from 'react';
 import styled from 'styled-components';
 import Board from './components/Board';
-// import * as THREE from 'three';
-import KilledPieces from 'components/KilledPieces'
+import KilledPieces from './components/KilledPieces.tsx'
 
 const Header = styled.h1`
   text-align: center;

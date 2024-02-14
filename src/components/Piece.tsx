@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import kingB from 'assets/images/kingB.svg';
 import queenB from 'assets/images/queenB.svg';
 import bishopB from 'assets/images/bishopB.svg';
@@ -11,12 +11,12 @@ import bishopW from 'assets/images/bishopW.svg';
 import knightW from 'assets/images/knightW.svg';
 import rookW from 'assets/images/rookW.svg';
 import pawnW from 'assets/images/pawnW.svg';
+import { PieceProps } from '../types/types';
 
+const Piece = ({ ID, name, color, onDragStart, position }: PieceProps) => {
+  const pieceRef = useRef<HTMLImageElement | null>(null);
 
-const Piece = ({ ID, name, color, onDragStart, position }) => {
-  const pieceRef = useRef();
-
-  const chosenPiece = (whitePiece, blackPiece) => {
+  const chosenPiece = (whitePiece: string, blackPiece: string) => {
     const chosenPiece = (color === "white") ? 
       (<img
         ref={pieceRef}
@@ -25,8 +25,8 @@ const Piece = ({ ID, name, color, onDragStart, position }) => {
         id={ID} 
         src={whitePiece}
         alt={whitePiece}
-        position={position}
-        name={name}
+        data-position={position}
+        data-name={name}
         data-piece={name+'W'}
         style={{
           height: "100%",
@@ -41,8 +41,8 @@ const Piece = ({ ID, name, color, onDragStart, position }) => {
         id={ID}
         src={blackPiece}
         alt={blackPiece}
-        position={position}
-        name={name}
+        data-position={position}
+        data-name={name}
         data-piece={name+'B'}
         style={{
           height: "100%",
@@ -53,7 +53,7 @@ const Piece = ({ ID, name, color, onDragStart, position }) => {
     return chosenPiece;
   }
 
-  var image = null
+  let image = null
   switch(name){
     case "king":
       image = chosenPiece(kingW, kingB)
