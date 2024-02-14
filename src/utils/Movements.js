@@ -206,6 +206,7 @@ const pawnKill = (currentPosition, fromTop) => {
     [[((x-1 >= 0) ? x-1 : null), ((y+1 <= 7) ? y+1 : null)],
     [((x-1 >= 0) ? x-1 : null), ((y-1 >= 0) ? y - 1 : null)]]
       
+  console.log(newPositions.filter((pos) => pos.includes(null)))
   return reversePositions(newPositions);
 }
 

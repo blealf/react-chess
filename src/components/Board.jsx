@@ -91,31 +91,30 @@ const Board = ({ reset }) => {
     whiteKilled,
     blackKilled,
     whiteMoved,
-    kingPosition,
     firstUpdate,
   }, dispatch] = useReducer(boardReducer, initialState)
 
   const storeDispatch = useDispatch()
   const boardRef = useRef(null);
   const updateKilledPieces = useCallback(() => {
-    console.log(blackKilled, whiteKilled)
+    // console.log(blackKilled, whiteKilled)
     storeDispatch(updateKilled({ blackKilled: blackKilled, whiteKilled: whiteKilled}))
   }, [blackKilled, whiteKilled, storeDispatch])
 
 
-  // useLayoutEffect(() => {
-  //   console.log(firstUpdate, whiteMoved)
-  //   if (firstUpdate && whiteMoved === false) {
-  //     dispatch({
-  //       type: 'SET_FIRST_UPDATE',
-  //       payload: false,
-  //     });
-  //     return;
-  //   }
-  //   setTimeout(() => {
-  //     flipBoard(whiteMoved ? "black" : "white");
-  //   }, 100);
-  // }, [whiteMoved, firstUpdate])
+  useLayoutEffect(() => {
+    // console.log(firstUpdate, whiteMoved)
+    if (firstUpdate && whiteMoved === false) {
+      dispatch({
+        type: 'SET_FIRST_UPDATE',
+        payload: false,
+      });
+      return;
+    }
+    setTimeout(() => {
+      flipBoard(whiteMoved ? "black" : "white");
+    }, 100);
+  }, [whiteMoved, firstUpdate])
 
   useEffect(() => {
     dispatch({

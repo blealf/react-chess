@@ -16,7 +16,7 @@ const GameSlice = createSlice({
   reducers: {
     updateKilled(state, action) {
       const { blackKilled, whiteKilled } = action.payload
-      console.log(blackKilled, whiteKilled)
+      // console.log(blackKilled, whiteKilled)
       state.killed['blackKilled'] = blackKilled
       state.killed['whiteKilled'] = whiteKilled
     },
