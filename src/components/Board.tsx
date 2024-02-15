@@ -1,6 +1,6 @@
-import React, { useEffect, useCallback, useRef, useLayoutEffect, useReducer } from 'react';
+import { useEffect, useCallback, useRef, useLayoutEffect, useReducer, DragEvent } from 'react';
 import styled from 'styled-components';
-import './style.css'
+import './style.css';
 import Square from './Square';
 import { chessPieces } from '../data';
 import {
@@ -10,10 +10,11 @@ import {
   knightMove,
   rookMove,
   pawnMove,
-} from 'utils/Movements';
-import { useDispatch } from 'react-redux'
-import { updateKilled } from 'features/GameSlice'
-import { simulate } from 'utils/simulate';
+} from '../utils/Movements';
+import { useDispatch } from 'react-redux';
+import { updateKilled } from '../features/GameSlice';
+import { simulate } from '../utils/simulate';
+import { BoardStatePayload, BoardStateType, ChessPieceArray, MovesReturnType, NumberArray } from '../types/types';
 
 const BoardWrapper = styled.div`
   margin: 0 auto;
@@ -36,8 +37,8 @@ const BoardWrapper = styled.div`
 // console.log(bishopMove([3,3]));
 // console.log(queenMove([3,3]));
 // console.log(testMoves([3,3]));
-const initialPosition = chessPieces
-const initialState = {
+const initialPosition: ChessPieceArray = chessPieces;
+const initialState: BoardStateType = {
   occupied: [],
   position: initialPosition,
   moveColor: [{
@@ -48,36 +49,36 @@ const initialState = {
   blackKilled: [],
   whiteMoved: false,
   kingPosition: {
-    white: initialPosition.find((piece) => piece.id === "wk1").value,
-    black: initialPosition.find((piece) => piece.id === "wk1").value
+    white: initialPosition.find((piece) => piece.id === 'wk1')?.value,
+    black: initialPosition.find((piece) => piece.id === 'wk1')?.value
   },
   firstUpdate: true
-}
+};
 
-const boardReducer = (state, action) => {
+const boardReducer = (state:BoardStateType , action: { type: string, payload: BoardStatePayload}) => {
   switch (action.type) {
     case 'SET_OCCUPIED':
-      return { ...state, occupied: action.payload }
+      return { ...state, occupied: action.payload };
     case 'SET_POSITION':
-      return { ...state, position: action.payload }
+      return { ...state, position: action.payload };
     case 'SET_MOVE_COLOR':
-      return { ...state, moveColor: action.payload }
+      return { ...state, moveColor: action.payload };
     case 'SET_BLACK_KILLED':
-      return { ...state, blackKilled: action.payload }
+      return { ...state, blackKilled: action.payload };
     case 'SET_WHITE_KILLED':
-      return { ...state, whiteKilled: action.payload }
+      return { ...state, whiteKilled: action.payload };
     case 'SET_WHITE_MOVED':
-      return { ...state, whiteMoved: action.payload }
+      return { ...state, whiteMoved: action.payload };
     case 'SET_KING_POSITION':
-      return { ...state, kingPosition: action.payload }
+      return { ...state, kingPosition: action.payload };
     case 'SET_FIRST_UPDATE':
-      return { ...state, firstUpdate: action.payload }
+      return { ...state, firstUpdate: action.payload };
     case 'RESET':
-      return initialState
+      return initialState;
     default:
-      return state
+      return state;
   }
-}
+};
 
 const Board = () => {
 
@@ -92,14 +93,14 @@ const Board = () => {
     blackKilled,
     whiteMoved,
     firstUpdate,
-  }, dispatch] = useReducer(boardReducer, initialState)
+  }, dispatch] = useReducer(boardReducer, initialState);
 
-  const storeDispatch = useDispatch()
+  const storeDispatch = useDispatch();
   const boardRef = useRef(null);
   const updateKilledPieces = useCallback(() => {
     // console.log(blackKilled, whiteKilled)
-    storeDispatch(updateKilled({ blackKilled: blackKilled, whiteKilled: whiteKilled}))
-  }, [blackKilled, whiteKilled, storeDispatch])
+    storeDispatch(updateKilled({ blackKilled: blackKilled, whiteKilled: whiteKilled}));
+  }, [blackKilled, whiteKilled, storeDispatch]);
 
 
   useLayoutEffect(() => {
@@ -112,40 +113,40 @@ const Board = () => {
       return;
     }
     setTimeout(() => {
-      flipBoard(whiteMoved ? "black" : "white");
+      flipBoard(whiteMoved ? 'black' : 'white');
     }, 100);
-  }, [whiteMoved, firstUpdate])
+  }, [whiteMoved, firstUpdate]);
 
   useEffect(() => {
     dispatch({
       type: 'SET_OCCUPIED',
       payload: position.map((p) => JSON.stringify(p.value))
-    })
-    updateKilledPieces()
+    });
+    updateKilledPieces();
 
   }, [position, updateKilledPieces]);
 
-  const onDragStart = (e) => {
+  const onDragStart = (e: DragEvent) => {
     e.dataTransfer.setData('text', e.target.id);
-    playPiece(e.target);
-  }
+    playPiece(e);
+  };
 
-  const setColor = (id, color) => {
-    let selectedColor = ""
-    moveColor.forEach(c => {
+  const setColor = (id: string, color: string): string => {
+    let selectedColor = '';
+    moveColor.forEach((c: { id: string, color: string }) => {
       if (c.id === id) {
-        selectedColor = c.color
-      } else { selectedColor = color }
-    })
+        selectedColor = c.color;
+      } else { selectedColor = color; }
+    });
     return selectedColor;
-  }
+  };
 
   
-  const createPattern = (color, currentPos) => {
+  const createPattern = (color: string, currentPos: NumberArray) => {
     checkedPattern.push(<Square
       tileColor={setColor(JSON.stringify(currentPos), color)}
       key={JSON.stringify(currentPos)}
-      ID={JSON.stringify(currentPos)}
+      uniqueId={JSON.stringify(currentPos)}
       squarePosition={currentPos}
       boardMatrix={position}
       onDragStart={onDragStart}
@@ -154,13 +155,13 @@ const Board = () => {
       setWhiteMoved={() => dispatch({ type: 'SET_WHITE_MOVED', payload: !whiteMoved})}
       changePosition={(val) => dispatch({ type: 'SET_POSITION', payload: val})}
       simulate={() => simulate({ position, whiteMoved, occupied })}
-      onChangeColor={(e) => changeColor(JSON.stringify(currentPos))}
-    />)
-  }
+      onChangeColor={() => changeColor(JSON.stringify(currentPos))}
+    />);
+  };
 
   for (let i = 0; i < 8; i++) {
     for (let j = 0; j < 8; j++) {
-      (swap) ? createPattern("white", [i, j]) : createPattern("brown", [i, j]);
+      (swap) ? createPattern('white', [i, j]) : createPattern('brown', [i, j]);
       swap = (j < 7) ? !swap : swap;
     }
   }
@@ -171,123 +172,125 @@ const Board = () => {
     ).forEach(() => {
       dispatch({ 
         type: 'SET_MOVE_COLOR', 
-        payload: [...moveColor, { id: id, color: "green" }]
-      })
-    })
-  }
+        payload: [...moveColor, { id: id, color: 'green' }]
+      });
+    });
+  };
 
-  const playPiece = (liftedPiece) => {
+  const playPiece = (e: DragEvent) => {
 
-    let canPlay = []
-    const piecePosition = []
-    const piece = liftedPiece.getAttribute("name")
-    const pieceColor = liftedPiece.getAttribute("id").charAt(0)
+    let canPlay: MovesReturnType = [];
+    const liftedPiece = e.target;
+    const piecePosition: NumberArray = [];
+    const piece = liftedPiece.getAttribute('name');
+    const pieceColor = liftedPiece.getAttribute('id').charAt(0);
     let moved = false;
     const canMove =
-      (whiteMoved === false && pieceColor === "w") ||
-      (whiteMoved === true && pieceColor === "b")
+      (whiteMoved === false && pieceColor === 'w') ||
+      (whiteMoved === true && pieceColor === 'b');
       
-    if (!canMove) return 
-    liftedPiece.getAttribute("position").split(",").forEach(num => {
-      piecePosition.push(parseInt(num))
-    })
+    if (!canMove) return; 
+    liftedPiece.getAttribute('position').split(',').forEach(num => {
+      piecePosition.push(parseInt(num));
+    });
 
-    if (((piecePosition[0] > 1) && pieceColor === "b") ||
-      ((piecePosition[0] < 6) && pieceColor === "w")) {
-      moved = true
+    if (((piecePosition[0] > 1) && pieceColor === 'b') ||
+      ((piecePosition[0] < 6) && pieceColor === 'w')) {
+      moved = true;
     }
 
     switch (piece) {
-      case "king":
-        canPlay = kingMove(piecePosition)
+      case 'king':
+        canPlay = kingMove(piecePosition);
         break;
-      case "queen":
-        canPlay = queenMove(piecePosition, occupied)
+      case 'queen':
+        canPlay = queenMove(piecePosition, occupied);
         break;
-      case "bishop":
-        canPlay = bishopMove(piecePosition, occupied)
+      case 'bishop':
+        canPlay = bishopMove(piecePosition, occupied);
         break;
-      case "knight":
-        canPlay = knightMove(piecePosition)
+      case 'knight':
+        canPlay = knightMove(piecePosition);
         break;
-      case "rook":
-        canPlay = rookMove(piecePosition, occupied)
+      case 'rook':
+        canPlay = rookMove(piecePosition, occupied);
         break;
-      case "pawn":
-        canPlay = (pieceColor === "b") ?
+      case 'pawn':
+        canPlay = (pieceColor === 'b') ?
           pawnMove(piecePosition, moved, true, occupied) :
-          pawnMove(piecePosition, moved, false, occupied)
+          pawnMove(piecePosition, moved, false, occupied);
         break;
       default:
     }
 
-    determineDropLocation(canPlay, liftedPiece)
-  }
+    determineDropLocation(canPlay, liftedPiece);
+  };
 
   const determineDropLocation = (play, liftedPiece) => {
     play.forEach(move => {
-      const square = document.getElementById(JSON.stringify(move))
+      const square = document.getElementById(JSON.stringify(move));
       if (square && square.children.length < 1) {
-        const element = document.createElement("div")
-        element.setAttribute("class", "highlightedMove")
+        const element = document.createElement('div');
+        element.setAttribute('class', 'highlightedMove');
         Object.assign(element.style, {
-          margin: "0 auto",
-          marginTop: "30px",
-          height: "20px",
-          width: "20px",
-          borderRadius: "5px",
-          backgroundColor: "green",
-        })
+          margin: '0 auto',
+          marginTop: '30px',
+          height: '20px',
+          width: '20px',
+          borderRadius: '5px',
+          backgroundColor: 'green',
+        });
         square.appendChild(element);
       }
       else {
         if (square && square.children.length > 0) {
           if(liftedPiece){
-            if(liftedPiece.getAttribute("id")?.charAt(0) !== square.children[0].getAttribute("id")?.charAt(0)){
+            if(liftedPiece.getAttribute('id')?.charAt(0) !== square.children[0].getAttribute('id')?.charAt(0)){
               square.setAttribute('class', 'killMove');
             }
           }
         }
       }
-    })
-  }
+    });
+  };
 
   const resetBoard = () => {
-    dispatch({ type: 'RESET' })
-    flipBoard("white");
-  }
+    dispatch({ type: 'RESET' });
+    flipBoard('white');
+  };
 
   const flipBoard = (color) => {
-    if (color === "white" || boardRef.current.style.transform.includes('170')) {
-      boardRef.current.style.transform = 'rotateY(-10deg) rotateX(20deg)'
+    if (color === 'white' || boardRef.current.style.transform.includes('170')) {
+      boardRef.current.style.transform = 'rotateY(-10deg) rotateX(20deg)';
       boardRef.current.childNodes.forEach((child) => {
         if (child.children[0]) {
-          child.children[0].style.transform = "rotate(0deg)"
+          child.children[0].style.transform = 'rotate(0deg)';
         }
       });
     } else {
-      boardRef.current.style.transform = "rotateY(170deg) rotateX(160deg)";
+      boardRef.current.style.transform = 'rotateY(170deg) rotateX(160deg)';
       boardRef.current.childNodes.forEach((child) => {
         if (child.children[0]) {
-          child.children[0].style.transform = "rotate(180deg)"
+          child.children[0].style.transform = 'rotate(180deg)';
         }
       });
     }
     // setPosition(position.map(pos => ({ ...pos, value: [7 - pos.value[0], 7 - pos.value[1]] })))
-  }
+  };
 
   const handleBoardUpdate = () => {
-    const elements = document.getElementsByClassName("highlightedMove")
-    const killMove = document.getElementsByClassName("killMove")
+    const elements = document.getElementsByClassName('highlightedMove');
+    const killMove = document.getElementsByClassName('killMove');
     try {
       while (elements.length > 0) {
         elements[0].parentNode.removeChild(elements[0]);
       }
       while (killMove.length > 0) {
-        killMove[0].removeAttribute("class");
+        killMove[0].removeAttribute('class');
       }
+    // eslint-disable-next-line no-empty
     } catch(err) {}
-  }
+  };
 
   return (
     <>
@@ -303,8 +306,8 @@ const Board = () => {
         {checkedPattern}
       </BoardWrapper>
     </>
-  )
-}
+  );
+};
 
-export default Board
+export default Board;
 

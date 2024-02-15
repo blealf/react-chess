@@ -1,7 +1,11 @@
-const moveUp = (value, occupied) => {
-  let x = value[1], y = value[0], newPoints = []
+import { ChessPieceType, MovesType } from '../types/types';
+
+const moveUp = (value: number[], occupied: ChessPieceType[]) => {
+  let y = value[0]
+  const x = value[1], newPoints = []
+  const occupiedString = JSON.stringify(occupied)
   while(y < 7) {
-    if(occupied?.includes(JSON.stringify([y+1,x]))) { 
+    if(occupiedString?.includes(JSON.stringify([y+1,x]))) { 
       newPoints.push([ x, y+1]);
       break;
     }
@@ -11,10 +15,12 @@ const moveUp = (value, occupied) => {
   return newPoints;
 }
 
-const moveDown = (value, occupied) => {
-  let x = value[1], y = value[0], newPoints = []
+const moveDown = (value: number[], occupied: ChessPieceType[]) => {
+  let y = value[0]
+  const x = value[1], newPoints = []
+  const occupiedString = JSON.stringify(occupied)
   while(y > 0) {
-    if(occupied?.indexOf(JSON.stringify([y-1,x])) >= 0) { 
+    if(occupiedString?.indexOf(JSON.stringify([y-1,x])) >= 0) { 
       newPoints.push([ x, y-1])
       break;
     }
@@ -24,10 +30,12 @@ const moveDown = (value, occupied) => {
   return newPoints;
 }
 
-const moveRight = (value, occupied) => {
-  let x = value[1], y = value[0], newPoints = []
+const moveRight = (value: number[], occupied: ChessPieceType[]) => {
+  let x = value[1]
+  const y = value[0], newPoints = []
+  const occupiedString = JSON.stringify(occupied)
   while(x < 7) {
-    if(occupied?.indexOf(JSON.stringify([y,x+1])) >= 0) { 
+    if(occupiedString?.indexOf(JSON.stringify([y,x+1])) >= 0) { 
       newPoints.push([ x+1, y])
       break;
     }
@@ -37,10 +45,12 @@ const moveRight = (value, occupied) => {
   return newPoints;
 }
 
-const moveLeft = (value, occupied) => {
-  let x = value[1], y = value[0], newPoints = []
+const moveLeft = (value: number[], occupied: ChessPieceType[]) => {
+  let x = value[1]
+  const y = value[0], newPoints = []
+  const occupiedString = JSON.stringify(occupied)
   while(x > 0) {
-    if(occupied?.indexOf(JSON.stringify([y,x-1])) >= 0) { 
+    if(occupiedString?.indexOf(JSON.stringify([y,x-1])) >= 0) { 
       newPoints.push([ x-1, y])
       break;
     }
@@ -50,12 +60,12 @@ const moveLeft = (value, occupied) => {
   return newPoints;
 }
 
-const moveLeftUp = (value, occupied) => {
-  var x = value[1]
-  var y = value[0]
-  let newPoints = []
-  while((x > 0) & (y > 0)) {
-    if (occupied?.indexOf(JSON.stringify([y - 1, x - 1])) >= 0) {
+const moveLeftUp = (value: number[], occupied: ChessPieceType[]) => {
+  let x = value[1], y = value[0]
+  const newPoints = []
+  const occupiedString = JSON.stringify(occupied)
+  while((x > 0) && (y > 0)) {
+    if (occupiedString?.indexOf(JSON.stringify([y - 1, x - 1])) >= 0) {
       newPoints.push([ x-1, y-1]);
       break;
     }
@@ -65,12 +75,12 @@ const moveLeftUp = (value, occupied) => {
   return newPoints;
 }
 
-const moveRightUp = (value, occupied) => {
-  var x = value[1]
-  var y = value[0]
-  let newPoints = []
-  while((x < 7) & (y > 0)) {
-    if (occupied?.indexOf(JSON.stringify([y - 1, x + 1])) >= 0) {
+const moveRightUp = (value: number[], occupied: ChessPieceType[]) => {
+  let x = value[1], y = value[0]
+  const newPoints = []
+  const occupiedString = JSON.stringify(occupied)
+  while((x < 7) && (y > 0)) {
+    if (occupiedString?.indexOf(JSON.stringify([y - 1, x + 1])) >= 0) {
       newPoints.push([ x+1, y-1]);
       break;
     }
@@ -80,12 +90,12 @@ const moveRightUp = (value, occupied) => {
   return newPoints;
 }
 
-const moveRightDown = (value, occupied) => {
-  var x = value[1]
-  var y = value[0]
-  let newPoints = []
-  while((x < 7) & (y < 7)) {
-    if (occupied?.indexOf(JSON.stringify([y + 1, x + 1])) >= 0) {
+const moveRightDown = (value: number[], occupied: ChessPieceType[]) => {
+  let  x = value[1], y = value[0]
+  const newPoints = []
+  const occupiedString = JSON.stringify(occupied)
+  while((x < 7) && (y < 7)) {
+    if (occupiedString?.indexOf(JSON.stringify([y + 1, x + 1])) >= 0) {
       newPoints.push([ x+1, y+1]);
       break;
     }
@@ -95,12 +105,12 @@ const moveRightDown = (value, occupied) => {
   return newPoints;
 }
 
-const moveLeftDown = (value, occupied) => {
-  var x = value[1]
-  var y = value[0]
-  let newPoints = []
-  while((x > 0) & (y < 7)) {
-    if (occupied?.indexOf(JSON.stringify([y + 1, x - 1])) >= 0) {
+const moveLeftDown = (value: number[], occupied: ChessPieceType[]) => {
+  let x = value[1], y = value[0]
+  const newPoints = []
+  const occupiedString = JSON.stringify(occupied)
+  while((x > 0) && (y < 7)) {
+    if (occupiedString?.indexOf(JSON.stringify([y + 1, x - 1])) >= 0) {
       newPoints.push([ x-1, y+1]);
       break;
     }
@@ -110,15 +120,14 @@ const moveLeftDown = (value, occupied) => {
   return newPoints;
 }
 
-const reversePositions = (positionsArray) => {
+const reversePositions = (positionsArray: (number | null)[][]): (number | null)[][] => {
   return positionsArray.map(pos => pos.reverse())
 }
 
-const kingMove = (currentPosition) => {
-  let x = currentPosition[1]
-  let y = currentPosition[0]
+const kingMove = (currentPosition: number[]) => {
+  const x = currentPosition[1], y = currentPosition[0]
 
-  let newPositions = [
+  const newPositions = [
     [x, ((y+1 <= 7) ? y+1 : null)],
     [x, ((y-1 >= 0) ? y-1 : null)],
     [((x+1 <= 7) ? x+1 : null), y],
@@ -132,14 +141,14 @@ const kingMove = (currentPosition) => {
   return reversePositions(newPositions);
 }
 
-const queenMove = (currentPosition, occupied) => {
+const queenMove = (currentPosition: number[], occupied: ChessPieceType[]) => {
   return [
     ...bishopMove(currentPosition, occupied),
     ...rookMove(currentPosition, occupied)
   ]
 }
 
-const bishopMove = (currentPosition, occupied) => {
+const bishopMove = (currentPosition: number[], occupied: ChessPieceType[]) => {
   return reversePositions([
     ...moveLeftUp(currentPosition, occupied),
     ...moveRightUp(currentPosition, occupied),
@@ -148,10 +157,9 @@ const bishopMove = (currentPosition, occupied) => {
   ])
 }
 
-const knightMove = (currentPosition) => {
-  let x = currentPosition[1]
-  let y = currentPosition[0]
-  let newPositions = [
+const knightMove = (currentPosition: number[]) => {
+  const x = currentPosition[1], y = currentPosition[0]
+  const newPositions = [
     [((x-2 >= 0) ? x-2 : null), ((y-1 >= 0) ? y-1 : null)],
     [((x-2 >= 0) ? x-2 : null), ((y+1 <= 7) ? y+1 : null)],
     [((x-1 >= 0) ? x-1 : null), ((y-2 >= 0) ? y-2 : null)],
@@ -165,7 +173,7 @@ const knightMove = (currentPosition) => {
   return reversePositions(newPositions);  
 }
 
-const rookMove = (currentPosition, occupied) => {
+const rookMove = (currentPosition: number[], occupied: ChessPieceType[]) => {
   return reversePositions([
     ...moveUp(currentPosition, occupied),
     ...moveDown(currentPosition, occupied),
@@ -174,9 +182,10 @@ const rookMove = (currentPosition, occupied) => {
   ]);
 }
 
-const pawnMove = (currentPosition, moved, fromTop, occupied) => {
-  let x = currentPosition[1]
-  let y = currentPosition[0]
+const pawnMove = (currentPosition: number[], moved: boolean, fromTop: boolean, occupied: ChessPieceType[]) => {
+  const x = currentPosition[1], y = currentPosition[0]
+  const occupiedString = JSON.stringify(occupied)
+
   let newPositions = (moved) ? 
     ((fromTop) ? 
       [[x, ((y+1 <= 7) ? y+1 : null)]] : 
@@ -185,34 +194,33 @@ const pawnMove = (currentPosition, moved, fromTop, occupied) => {
       [[x, ((y+1 <= 7) ? y+1 : null)], [x, ((y+2 <= 7) ? y+2 : null)]] : 
       [[x, ((y-1 >= 0) ? y-1 : null)], [x, ((y-2 >= 0) ? y-2 : null)]]);
   newPositions = newPositions.filter(position => {
-    return !occupied.includes(JSON.stringify([position[1], position[0]]))
+    return !occupiedString.includes(JSON.stringify([position[1], position[0]]))
   })
   pawnKill([x, y], fromTop).forEach((point) => {
-    if (occupied.includes(JSON.stringify([point[1], point[0]]))) {
+    if (occupiedString.includes(JSON.stringify([point[1], point[0]]))) {
       newPositions.push(point);
     }
   })
   return reversePositions(newPositions);
 }
 
-const pawnKill = (currentPosition, fromTop) => {
-  let x = currentPosition[1]
-  let y = currentPosition[0]
+const pawnKill = (currentPosition: number[], fromTop: boolean) => {
+  const x = currentPosition[1], y = currentPosition[0]
   
-  let newPositions = (fromTop) ? 
+  const newPositions = (fromTop) ? 
     [[((x+1 <= 7) ? x+1 : null), ((y+1 <= 7) ? y+1 : null)],
     [((x+1 <= 7) ? x+1 : null), ((y-1 >= 0) ? y-1 : null)]]
     :
     [[((x-1 >= 0) ? x-1 : null), ((y+1 <= 7) ? y+1 : null)],
     [((x-1 >= 0) ? x-1 : null), ((y-1 >= 0) ? y - 1 : null)]]
       
-  console.log(newPositions.filter((pos) => pos.includes(null)))
+  // console.log(newPositions.filter((pos) => pos.includes(null)))
   return reversePositions(newPositions);
 }
 
 export {
   kingMove, 
-  queenMove, 
+  queenMove,
   bishopMove, 
   knightMove, 
   rookMove, 
@@ -220,13 +228,13 @@ export {
   pawnKill,
 }
 
-const moves = {
+const moves: MovesType = {
   kingMove, 
   queenMove, 
   bishopMove, 
   knightMove, 
   rookMove, 
-  pawnMove, 
+  pawnMove,
   pawnKill,
 }
 

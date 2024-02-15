@@ -11,7 +11,7 @@ interface InitialStateType {
   savedPositions: ChessPieceType[] | [],
   occupied: ChessPieceType[],
   killed: KilledType,
-  allMoves?: number[][],
+  allMoves?: Array<number>[],
 }
 const initialState: InitialStateType = {
   positions: [],

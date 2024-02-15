@@ -13,64 +13,64 @@ import rookW from 'assets/images/rookW.svg';
 import pawnW from 'assets/images/pawnW.svg';
 import { PieceProps } from '../types/types';
 
-const Piece = ({ ID, name, color, onDragStart, position }: PieceProps) => {
+const Piece = ({ uniqueId, name, color, onDragStart, position }: PieceProps) => {
   const pieceRef = useRef<HTMLImageElement | null>(null);
 
   const chosenPiece = (whitePiece: string, blackPiece: string) => {
-    const chosenPiece = (color === "white") ? 
+    const chosenPiece = (color === 'white') ? 
       (<img
         ref={pieceRef}
         draggable
         onDragStart={onDragStart}
-        id={ID} 
+        id={uniqueId} 
         src={whitePiece}
         alt={whitePiece}
         data-position={position}
         data-name={name}
         data-piece={name+'W'}
         style={{
-          height: "100%",
-          width: "100%",
-          padding: "0px",
-          transition: "all 0.5s ease-in-out"
+          height: '100%',
+          width: '100%',
+          padding: '0px',
+          transition: 'all 0.5s ease-in-out'
         }}/>) : 
       (<img
         ref={pieceRef}
         draggable
         onDragStart={onDragStart}
-        id={ID}
+        id={uniqueId}
         src={blackPiece}
         alt={blackPiece}
         data-position={position}
         data-name={name}
         data-piece={name+'B'}
         style={{
-          height: "100%",
-          width: "100%",
-          padding: "0px",
-          transition: "all 0.5s ease-in-out"
+          height: '100%',
+          width: '100%',
+          padding: '0px',
+          transition: 'all 0.5s ease-in-out'
         }}/>);
     return chosenPiece;
   }
 
   let image = null
   switch(name){
-    case "king":
+    case 'king':
       image = chosenPiece(kingW, kingB)
       break;
-    case "queen":
+    case 'queen':
       image = chosenPiece(queenW, queenB)
       break;
-    case "bishop":
+    case 'bishop':
       image = chosenPiece(bishopW, bishopB)
       break;
-    case "knight":
+    case 'knight':
       image = chosenPiece(knightW, knightB)
       break;
-    case "rook":
+    case 'rook':
       image = chosenPiece(rookW, rookB)
       break;
-    case "pawn":
+    case 'pawn':
       image = chosenPiece(pawnW, pawnB)
       break;
     default:
