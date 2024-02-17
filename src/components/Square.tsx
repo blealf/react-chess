@@ -1,8 +1,16 @@
-import { DragEvent, useRef } from 'react';
+import { DragEvent, ReactNode, useRef } from 'react';
 import Piece from './Piece';
 import { ChessPieceType, SquarePropsType } from '../types/types';
 
 
+/* The `Square` component in this TypeScript React code snippet is responsible for rendering a square
+on a chessboard. It takes several props as input, including `boardMatrix` (which represents the
+current state of the chessboard), `changePosition` (a function to update the position of a chess
+piece), `uniqueId` (a unique identifier for the square), `onDragStart` (a function to handle the
+start of a drag operation), `squarePosition` (the position of the square on the board), `tileColor`
+(the color of the square), `updateBlackKill` and `updateWhiteKill` (functions to update the kill
+count for black and white pieces), `setWhiteMoved` (a function to set a flag for white pieces being
+moved), and `simulate` (a function to simulate the game). */
 const Square = ({
   boardMatrix,
   changePosition,
@@ -17,6 +25,12 @@ const Square = ({
 }: SquarePropsType) => {
   const squareRef = useRef<HTMLDivElement | null>(null);
   
+  /**
+   * The function `movePiece` filters the `boardMatrix` to find a specific piece by its `id`, updates
+   * its position, sets a flag for white pieces being moved, and then simulates the game.
+   * @param {string | undefined} id - The `id` parameter is a string that represents the unique
+   * identifier of a chess piece.
+   */
   const movePiece = async (id: string | undefined) => {
     boardMatrix.filter((piece: { id: string}) => piece.id === id)
       .forEach((p: ChessPieceType) => {
@@ -26,6 +40,14 @@ const Square = ({
     simulate();
   };
 
+  /**
+   * The handleDrop function in TypeScript React handles dropping a draggable element, checking for
+   * valid moves and updating game state accordingly.
+   * @param {DragEvent} e - The parameter `e` in the `handleDrop` function is of type `DragEvent`,
+   * which is an event object that is triggered when a dragged element is being dropped onto a drop
+   * target. This event object contains information about the drag and drop operation, such as the data
+   * being dragged, the target
+   */
   const handleDrop = (e: DragEvent) => {
     e.preventDefault();
 
@@ -35,9 +57,7 @@ const Square = ({
     const currentSquareRef = squareRef.current?.children;
     const dropIndicator = currentSquareRef && currentSquareRef[0];
 
-    if (dropIndicator
-      && dropIndicator.className
-      && dropIndicator.className === 'highlightedMove'){
+    if (dropIndicator?.className === 'highlightedMove'){
         movePiece(id);
     } 
     
@@ -70,9 +90,29 @@ const Square = ({
     e.dataTransfer?.clearData();
   };
 
+  /**
+   * The handleDragOver function prevents the default behavior of a drag event.
+   * @param {DragEvent} e - DragEvent
+   */
   const handleDragOver = (e: DragEvent) => {
     e.preventDefault();
   };
+
+  const renderBoardMatrix = (): ReactNode => {
+    return boardMatrix.filter(pos => (JSON.stringify(squarePosition) === JSON.stringify(pos.value)))
+      .map(p => {
+        return(<Piece
+          color={(p.id.includes('w')) ? 'white' : 'black'} 
+          uniqueId={p.id} 
+          name={p.title} 
+          info={p.title + p.id.includes('w') ? 'W' : 'B' }
+          key={p.id}
+          onDragStart={onDragStart}
+          position={p.value}
+        />);
+        }
+      )
+  }
 
   return (
     <div
@@ -88,20 +128,7 @@ const Square = ({
       onDragOver={handleDragOver}
       data-position={squarePosition}
     >
-      {boardMatrix.filter(pos => (JSON.stringify(squarePosition) === JSON.stringify(pos.value)))
-        .map(p => {
-          return(<Piece
-            color={(p.id.includes('w')) ? 'white' : 'black'} 
-            uniqueId={p.id} 
-            name={p.title} 
-            info={p.title + p.id.includes('w') ? 'W' : 'B' }
-            key={p.id}
-            onDragStart={onDragStart}
-            position={p.value}
-          />);
-          }
-        )
-      }
+      {renderBoardMatrix()}
     </div>
   );
 };

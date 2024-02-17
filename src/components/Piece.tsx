@@ -13,9 +13,22 @@ import rookW from '../assets/images/rookW.svg';
 import pawnW from '../assets/images/pawnW.svg';
 import { PieceProps } from '../types/types';
 
+/* This code snippet defines a functional component named `Piece` in a TypeScript React application.
+The component takes in props `uniqueId`, `name`, `color`, `onDragStart`, and `position` of type
+`PieceProps`. It renders a chess piece */
 const Piece = ({ uniqueId, name, color, onDragStart, position }: PieceProps) => {
   const pieceRef = useRef<HTMLImageElement | null>(null);
 
+ /**
+  * The function `chosenPiece` returns an image element based on the color provided (white or black)
+  * along with specific attributes and styles.
+  * @param {string} whitePiece - The `whitePiece` parameter in the `chosenPiece` function represents
+  * the image source for the white piece in a chess game. It is used to display the white piece on the
+  * game board when the color is set to 'white'.
+  * @param {string} blackPiece - The `blackPiece` parameter in the `chosenPiece` function is a string
+  * that represents the image source for the black chess piece. It is used to dynamically create an
+  * `<img>` element for the black chess piece based on the color condition in the function.
+  */
   const chosenPiece = (whitePiece: string, blackPiece: string) => {
     const chosenPiece = (color === 'white') ? 
       (<img
