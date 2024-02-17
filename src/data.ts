@@ -1,4 +1,6 @@
-const chessPieces = [
+import { ChessPieceType } from './types/types'
+
+const chessPieces: ChessPieceType[] = [
   { id: "bk1", title: "king", value: [0,4], moved: false},
   { id: "bq1", title: "queen", value: [0,3], moved: false},
   { id: "bb1", title: "bishop", value: [0,2], moved: false},

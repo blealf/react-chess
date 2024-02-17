@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
@@ -11,7 +11,7 @@ const KilledSection = styled.div`
 const KilledPieces = () => {
   const [blackKilled, setBlackKilled] = useState([])
   const [whiteKilled, setWhiteKilled] = useState([])
-  const killed = useSelector((store) => store.game.killed)
+  const killed = useSelector((store: any) => store.game.killed)
   
   useEffect(() => {
     setBlackKilled(killed.blackKilled)
