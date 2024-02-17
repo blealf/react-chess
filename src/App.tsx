@@ -9,7 +9,7 @@ const Header = styled.h1`
 const App = () => {
 
   return (
-    <div className="App">
+    <div className="app">
       <Header>Chess Game</Header>
       <Board />
       <KilledPieces />

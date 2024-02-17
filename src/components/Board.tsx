@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef, useLayoutEffect, useReducer, DragEvent } from 'react';
+import { useEffect, useCallback, useRef, useLayoutEffect, useReducer, DragEvent, ReactNode, ReactElement } from 'react';
 import styled from 'styled-components';
 import './style.css';
 import Square from './Square';
@@ -14,11 +14,11 @@ import {
 import { useDispatch } from 'react-redux';
 import { updateKilled } from '../features/GameSlice';
 import { simulate } from '../utils/simulate';
-import { BoardStatePayload, BoardStateType, ChessPieceArray, MovesReturnType, NumberArray } from '../types/types';
+import { BoardStateType, ChessPieceArray, MovesReturnType, NumberArray } from '../types/types';
 
 const BoardWrapper = styled.div`
   margin: 0 auto;
-  width: 700px;
+  max-width: 700px;
   height: 700px;
   margin-bottom: -10px;
   border: 1px solid teal;
@@ -55,7 +55,7 @@ const initialState: BoardStateType = {
   firstUpdate: true
 };
 
-const boardReducer = (state:BoardStateType , action: { type: string, payload: BoardStatePayload}) => {
+const boardReducer = (state:BoardStateType , action: { type: string, payload: Partial<BoardStateType>}) => {
   switch (action.type) {
     case 'SET_OCCUPIED':
       return { ...state, occupied: action.payload };
@@ -79,11 +79,22 @@ const boardReducer = (state:BoardStateType , action: { type: string, payload: Bo
       return state;
   }
 };
+type x = [
+      state: BoardStateType,
+      dispatch: (type: string, payload: Partial<BoardStateType>) => void]
+type ReducerFunction = (
+  (((
+    state: BoardStateType,
+    action: { type: string, payload: Partial<BoardStateType> }
+  ) => BoardStateType), BoardStateType) => 
+      {BoardStateType,
+      (type: string, payload: Partial<BoardStateType>) => void}
+)
 
 const Board = () => {
 
-  const checkedPattern = [];
-  let swap = false;
+  const checkedPattern: ReactElement[] = [];
+  let swap: boolean = false;
 
   const [{
     occupied,
@@ -93,10 +104,10 @@ const Board = () => {
     blackKilled,
     whiteMoved,
     firstUpdate,
-  }, dispatch] = useReducer(boardReducer, initialState);
+  }, dispatch] = useReducer<ReducerFunction>(boardReducer, initialState);
 
   const storeDispatch = useDispatch();
-  const boardRef = useRef(null);
+  const boardRef = useRef<HTMLDivElement | null>(null);
   const updateKilledPieces = useCallback(() => {
     // console.log(blackKilled, whiteKilled)
     storeDispatch(updateKilled({ blackKilled: blackKilled, whiteKilled: whiteKilled}));
@@ -127,7 +138,8 @@ const Board = () => {
   }, [position, updateKilledPieces]);
 
   const onDragStart = (e: DragEvent) => {
-    e.dataTransfer.setData('text', e.target.id);
+    const target: EventTarget & { id: string } = e.target
+    e.dataTransfer.setData('text', target.id);
     playPiece(e);
   };
 
@@ -167,7 +179,7 @@ const Board = () => {
   }
 
   const changeColor = (id) => {
-    checkedPattern.filter(square =>
+    checkedPattern.filter((square: ReactElement) =>
       id === square.props.position
     ).forEach(() => {
       dispatch({ 
@@ -177,7 +189,7 @@ const Board = () => {
     });
   };
 
-  const playPiece = (e: DragEvent) => {
+  const playPiece = (e: Event) => {
 
     let canPlay: MovesReturnType = [];
     const liftedPiece = e.target;
@@ -226,8 +238,8 @@ const Board = () => {
     determineDropLocation(canPlay, liftedPiece);
   };
 
-  const determineDropLocation = (play, liftedPiece) => {
-    play.forEach(move => {
+  const determineDropLocation = (play: MovesReturnType, liftedPiece) => {
+    play.forEach((move: NumberArray) => {
       const square = document.getElementById(JSON.stringify(move));
       if (square && square.children.length < 1) {
         const element = document.createElement('div');
@@ -259,17 +271,19 @@ const Board = () => {
     flipBoard('white');
   };
 
-  const flipBoard = (color) => {
-    if (color === 'white' || boardRef.current.style.transform.includes('170')) {
-      boardRef.current.style.transform = 'rotateY(-10deg) rotateX(20deg)';
-      boardRef.current.childNodes.forEach((child) => {
-        if (child.children[0]) {
+  const flipBoard = (color: string) => {
+    const currentBoardRef = boardRef?.current
+    let refStyle: any = currentBoardRef?.style
+    if (color === 'white' || currentBoardRef?.style.transform.includes('170')) {
+      refStyle.transform = 'rotateY(-10deg) rotateX(20deg)';
+      currentBoardRef?.childNodes.forEach((child) => {
+        if (child?.children[0]) {
           child.children[0].style.transform = 'rotate(0deg)';
         }
       });
     } else {
-      boardRef.current.style.transform = 'rotateY(170deg) rotateX(160deg)';
-      boardRef.current.childNodes.forEach((child) => {
+      refStyle.transform = 'rotateY(170deg) rotateX(160deg)';
+      currentBoardRef?.childNodes?.forEach((child) => {
         if (child.children[0]) {
           child.children[0].style.transform = 'rotate(180deg)';
         }

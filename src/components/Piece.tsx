@@ -1,16 +1,16 @@
 import { useRef } from 'react';
-import kingB from 'assets/images/kingB.svg';
-import queenB from 'assets/images/queenB.svg';
-import bishopB from 'assets/images/bishopB.svg';
-import knightB from 'assets/images/knightB.svg';
-import rookB from 'assets/images/rookB.svg';
-import pawnB from 'assets/images/pawnB.svg';
-import kingW from 'assets/images/kingW.svg';
-import queenW from 'assets/images/queenW.svg';
-import bishopW from 'assets/images/bishopW.svg';
-import knightW from 'assets/images/knightW.svg';
-import rookW from 'assets/images/rookW.svg';
-import pawnW from 'assets/images/pawnW.svg';
+import kingB from '../assets/images/kingB.svg';
+import queenB from '../assets/images/queenB.svg';
+import bishopB from '../assets/images/bishopB.svg';
+import knightB from '../assets/images/knightB.svg';
+import rookB from '../assets/images/rookB.svg';
+import pawnB from '../assets/images/pawnB.svg';
+import kingW from '../assets/images/kingW.svg';
+import queenW from '../assets/images/queenW.svg';
+import bishopW from '../assets/images/bishopW.svg';
+import knightW from '../assets/images/knightW.svg';
+import rookW from '../assets/images/rookW.svg';
+import pawnW from '../assets/images/pawnW.svg';
 import { PieceProps } from '../types/types';
 
 const Piece = ({ uniqueId, name, color, onDragStart, position }: PieceProps) => {
