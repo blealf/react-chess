@@ -1,6 +1,6 @@
-import { ChessPieceType } from './types/types'
+import { ChessPieceArray } from '../types/types'
 
-const chessPieces: ChessPieceType[] = [
+export const chessPieces: ChessPieceArray = [
   { id: "bk1", title: "king", value: [0,4], moved: false},
   { id: "bq1", title: "queen", value: [0,3], moved: false},
   { id: "bb1", title: "bishop", value: [0,2], moved: false},
@@ -35,5 +35,3 @@ const chessPieces: ChessPieceType[] = [
   { id: "wp7", title: "pawn", value: [6,6], moved: false},
   { id: "wp8", title: "pawn", value: [6,7], moved: false},
 ]
-
-export { chessPieces }

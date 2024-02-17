@@ -1,18 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { ChessPieceType } from '../types/types'
+import { InitialStateType, KilledType } from '../types/types'
 
-type KilledType = {
-  blackKilled: ChessPieceType[]
-  whiteKilled: ChessPieceType[]
-}
-interface InitialStateType {
-  positions: ChessPieceType | [],
-  savedPositions: ChessPieceType[] | [],
-  occupied: ChessPieceType[],
-  killed: KilledType,
-  allMoves?: Array<number>[],
-}
+
 const initialState: InitialStateType = {
   positions: [],
   savedPositions: [],
