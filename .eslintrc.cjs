@@ -35,7 +35,7 @@ module.exports = {
     "react-hooks/exhaustive-deps": "warn",
     "import/prefer-default-export": "off",
     "react/prop-types": "off",
-    "prettier/prettier": [ "error", { "endOfLine": "auto" } ]
+    "prettier/prettier": ["error", { "endOfLine": "auto" }],
   },
   "settings": {
     "import/resolver": {

@@ -1,6 +1,5 @@
-import { useEffect, useCallback, useRef, useLayoutEffect, useReducer, DragEvent, ReactNode, ReactElement } from 'react';
+import React, { useEffect, useCallback, useRef, useLayoutEffect, useReducer, DragEvent, ReactElement, ReactEventHandler, ReactNode } from 'react';
 import styled from 'styled-components';
-import './style.css';
 import Square from './Square';
 import { chessPieces } from '../data';
 import {
@@ -14,7 +13,7 @@ import {
 import { useDispatch } from 'react-redux';
 import { updateKilled } from '../features/GameSlice';
 import { simulate } from '../utils/simulate';
-import { BoardStateType, ChessPieceArray, MovesReturnType, NumberArray } from '../types/types';
+import { BoardStatePayload, BoardStateType, ChessPieceArray, MovesReturnType, NumberArray } from '../types/types';
 
 const BoardWrapper = styled.div`
   margin: 0 auto;
@@ -55,7 +54,7 @@ const initialState: BoardStateType = {
   firstUpdate: true
 };
 
-const boardReducer = (state:BoardStateType , action: { type: string, payload: Partial<BoardStateType>}) => {
+const boardReducer = (state:BoardStateType , action: { type: string, payload?: any}): BoardStateType => {
   switch (action.type) {
     case 'SET_OCCUPIED':
       return { ...state, occupied: action.payload };
@@ -79,22 +78,11 @@ const boardReducer = (state:BoardStateType , action: { type: string, payload: Pa
       return state;
   }
 };
-type x = [
-      state: BoardStateType,
-      dispatch: (type: string, payload: Partial<BoardStateType>) => void]
-type ReducerFunction = (
-  (((
-    state: BoardStateType,
-    action: { type: string, payload: Partial<BoardStateType> }
-  ) => BoardStateType), BoardStateType) => 
-      {BoardStateType,
-      (type: string, payload: Partial<BoardStateType>) => void}
-)
 
 const Board = () => {
 
   const checkedPattern: ReactElement[] = [];
-  let swap: boolean = false;
+  let swap = false;
 
   const [{
     occupied,
@@ -104,10 +92,10 @@ const Board = () => {
     blackKilled,
     whiteMoved,
     firstUpdate,
-  }, dispatch] = useReducer<ReducerFunction>(boardReducer, initialState);
+  }, dispatch] = useReducer(boardReducer, initialState);
 
   const storeDispatch = useDispatch();
-  const boardRef = useRef<HTMLDivElement | null>(null);
+  const boardRef = useRef<HTMLDivElement>(null);
   const updateKilledPieces = useCallback(() => {
     // console.log(blackKilled, whiteKilled)
     storeDispatch(updateKilled({ blackKilled: blackKilled, whiteKilled: whiteKilled}));
@@ -138,9 +126,9 @@ const Board = () => {
   }, [position, updateKilledPieces]);
 
   const onDragStart = (e: DragEvent) => {
-    const target: EventTarget & { id: string } = e.target
+    const target = e.target as HTMLImageElement
     e.dataTransfer.setData('text', target.id);
-    playPiece(e);
+    playPiece(target);
   };
 
   const setColor = (id: string, color: string): string => {
@@ -178,7 +166,7 @@ const Board = () => {
     }
   }
 
-  const changeColor = (id) => {
+  const changeColor = (id: string) => {
     checkedPattern.filter((square: ReactElement) =>
       id === square.props.position
     ).forEach(() => {
@@ -189,21 +177,20 @@ const Board = () => {
     });
   };
 
-  const playPiece = (e: Event) => {
+  const playPiece = (liftedPiece: HTMLImageElement) => {
 
     let canPlay: MovesReturnType = [];
-    const liftedPiece = e.target;
     const piecePosition: NumberArray = [];
-    const piece = liftedPiece.getAttribute('name');
-    const pieceColor = liftedPiece.getAttribute('id').charAt(0);
+    const piece = liftedPiece?.getAttribute('data-name');
+    const pieceColor = liftedPiece?.getAttribute('id')?.charAt(0);
     let moved = false;
     const canMove =
       (whiteMoved === false && pieceColor === 'w') ||
       (whiteMoved === true && pieceColor === 'b');
       
     if (!canMove) return; 
-    liftedPiece.getAttribute('position').split(',').forEach(num => {
-      piecePosition.push(parseInt(num));
+    liftedPiece?.getAttribute('data-position')?.split(',').forEach((val: string) => {
+      piecePosition.push(parseInt(val));
     });
 
     if (((piecePosition[0] > 1) && pieceColor === 'b') ||
@@ -238,7 +225,7 @@ const Board = () => {
     determineDropLocation(canPlay, liftedPiece);
   };
 
-  const determineDropLocation = (play: MovesReturnType, liftedPiece) => {
+  const determineDropLocation = (play: MovesReturnType, liftedPiece: HTMLImageElement) => {
     play.forEach((move: NumberArray) => {
       const square = document.getElementById(JSON.stringify(move));
       if (square && square.children.length < 1) {
@@ -271,23 +258,32 @@ const Board = () => {
     flipBoard('white');
   };
 
-  const flipBoard = (color: string) => {
+  const flipBoard = (color?: string) => {
     const currentBoardRef = boardRef?.current
     let refStyle: any = currentBoardRef?.style
     if (color === 'white' || currentBoardRef?.style.transform.includes('170')) {
       refStyle.transform = 'rotateY(-10deg) rotateX(20deg)';
-      currentBoardRef?.childNodes.forEach((child) => {
-        if (child?.children[0]) {
-          child.children[0].style.transform = 'rotate(0deg)';
-        }
-      });
+
+      if (currentBoardRef?.children) {
+        Array.from(currentBoardRef?.children).forEach((child) => {
+          if (child?.children[0]) {
+            const children= child.children[0] as HTMLElement
+            children.style.transform = 'rotate(0deg)';
+          }
+        });
+      }
     } else {
       refStyle.transform = 'rotateY(170deg) rotateX(160deg)';
-      currentBoardRef?.childNodes?.forEach((child) => {
-        if (child.children[0]) {
-          child.children[0].style.transform = 'rotate(180deg)';
-        }
-      });
+
+      if (currentBoardRef?.children) {
+        Array.from(currentBoardRef?.children).forEach((child) => {
+          if (child.children[0]) {
+            const children= child.children[0] as HTMLElement
+            children.style.transform = 'rotate(180deg)';
+          }
+        });
+      }
+      
     }
     // setPosition(position.map(pos => ({ ...pos, value: [7 - pos.value[0], 7 - pos.value[1]] })))
   };
@@ -297,7 +293,7 @@ const Board = () => {
     const killMove = document.getElementsByClassName('killMove');
     try {
       while (elements.length > 0) {
-        elements[0].parentNode.removeChild(elements[0]);
+        elements[0]?.parentNode?.removeChild(elements[0]);
       }
       while (killMove.length > 0) {
         killMove[0].removeAttribute('class');
@@ -311,7 +307,7 @@ const Board = () => {
       <div className="board">
         <button onClick={() => simulate({ position, whiteMoved, occupied })}>Simulate</button>
         <button onClick={resetBoard}>Reset</button>
-        <button onClick={flipBoard}>Flip</button>
+        <button onClick={() => flipBoard()}>Flip</button>
       </div>
       <BoardWrapper
         ref={boardRef}
