@@ -69,19 +69,32 @@ export interface BoardStateType {
   }
   firstUpdate?: boolean
 }
-export interface BoardStatePayload {
-  occupied?: ChessPieceArray
-  position?: ChessPieceArray
-  moveColor?: Array<{
-    id: string
-    color: string
-  }>
-  whiteKilled?: ChessPieceArray
-  blackKilled?: ChessPieceArray
-  whiteMoved?: boolean
-  kingPosition?: {
-    white: NumberArray | undefined
-    black: NumberArray | undefined
-  }
-  firstUpdate?: boolean
+export type BoardStatePayload = Partial<BoardStateType>
+// export interface BoardStatePayload {
+//   occupied?: ChessPieceArray
+//   position?: ChessPieceArray
+//   moveColor?: Array<{
+//     id: string
+//     color: string
+//   }>
+//   whiteKilled?: ChessPieceArray
+//   blackKilled?: ChessPieceArray
+//   whiteMoved?: boolean
+//   kingPosition?: {
+//     white: NumberArray | undefined
+//     black: NumberArray | undefined
+//   }
+//   firstUpdate?: boolean
+// }
+
+type KilledType = {
+  blackKilled: ChessPieceType[]
+  whiteKilled: ChessPieceType[]
+}
+interface InitialStateType {
+  positions: ChessPieceType | [],
+  savedPositions: ChessPieceType[] | [],
+  occupied: ChessPieceType[],
+  killed: KilledType,
+  allMoves?: Array<number>[],
 }

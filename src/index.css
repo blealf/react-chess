@@ -5,7 +5,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #333;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -24,8 +24,6 @@ canvas {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
@@ -33,4 +31,9 @@ body {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+.app {
+  width: 800px;
+  margin: 0 auto;
 }
