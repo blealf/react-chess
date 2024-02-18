@@ -258,9 +258,7 @@ const Board = () => {
         canPlay = rookMove(piecePosition, occupied);
         break;
       case 'pawn':
-        canPlay = (pieceColor === 'b') ?
-          pawnMove(piecePosition, moved, true, occupied) :
-          pawnMove(piecePosition, moved, false, occupied);
+        canPlay = pawnMove(piecePosition, moved, pieceColor === 'b', occupied)
         break;
       default:
     }
@@ -278,8 +276,11 @@ const Board = () => {
  * by the player.
  */
   const determineDropLocation = (play: MovesReturnType, liftedPiece: HTMLImageElement) => {
+    console.log({ id: liftedPiece.dataset.position })
     play.forEach((move: NumberArray) => {
+      // console.log({ move })
       const square = document.getElementById(JSON.stringify(move));
+      // console.log(square)
       if (square && square.children.length < 1) {
         const element = document.createElement('div');
         element.setAttribute('class', 'highlightedMove');
@@ -314,6 +315,8 @@ const Board = () => {
   * Otherwise, it
   */
   const flipBoard = (color?: string) => {
+    const testNoFlip = true
+    if (testNoFlip) return
     const currentBoardRef = boardRef?.current
     let refStyle: any = currentBoardRef?.style
 
@@ -366,6 +369,7 @@ const Board = () => {
   const resetBoard = () => {
     dispatch({ type: 'RESET' });
     flipBoard('white');
+    window.location.reload()
   };
 
   const canReset = (): boolean => {
