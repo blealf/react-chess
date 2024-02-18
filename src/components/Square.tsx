@@ -32,10 +32,12 @@ const Square = ({
    * identifier of a chess piece.
    */
   const movePiece = async (id: string | undefined) => {
-    boardMatrix.filter((piece: { id: string}) => piece.id === id)
-      .forEach((p: ChessPieceType) => {
-        changePosition([...(boardMatrix.filter(piece => piece.id !== id)), {id: p.id, title: p.title, value: squarePosition}]);
-      });
+    const currentPiece = boardMatrix.find((piece: { id: string }) => piece.id === id)
+    if (currentPiece) {
+      changePosition([...(boardMatrix.filter((piece) => piece.id !== id)),
+        { id: currentPiece.id, title: currentPiece.title, value: squarePosition }]
+      );
+    }
     await setWhiteMoved();
     simulate();
   };

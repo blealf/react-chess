@@ -9,6 +9,7 @@ export interface ChessPieceType {
 
 export type ChessPieceArray = Array<ChessPieceType>
 export type NumberArray = Array<number>
+export type StringArray = Array<string>
 export type Nullable = (T | null)
 export type MovesReturnType = Array<Nullable<number>>[]
 
@@ -23,18 +24,18 @@ export interface PieceProps {
 
 export interface MovesType {
   kingMove: (currentPosition: NumberArray) => MovesReturnType
-  queenMove: (currentPosition: NumberArray, occupied: ChessPieceArray) => MovesReturnType
-  bishopMove: (currentPosition: NumberArray, occupied: ChessPieceArray) => MovesReturnType
+  queenMove: (currentPosition: NumberArray, occupied: StringArray) => MovesReturnType
+  bishopMove: (currentPosition: NumberArray, occupied: StringArray) => MovesReturnType
   knightMove: (currentPosition: NumberArray) => MovesReturnType
-  rookMove: (currentPosition: NumberArray, occupied: ChessPieceArray) => MovesReturnType
-  pawnMove: (currentPosition: NumberArray, moved: boolean, fromTop: boolean, occupied: ChessPieceArray) => MovesReturnType
+  rookMove: (currentPosition: NumberArray, occupied: StringArray) => MovesReturnType
+  pawnMove: (currentPosition: NumberArray, moved: boolean, fromTop: boolean, occupied: StringArray) => MovesReturnType
   pawnKill: (currentPosition: NumberArray, fromTop: boolean) => MovesReturnType
 }
 
 export interface SimulateArgsType {
   position: ChessPieceArray,
   whiteMoved: boolean,
-  occupied: ChessPieceArray
+  occupied: StringArray
 }
 
 export type SimulateFunction = ({ position, whiteMoved, occupied }: SimulateArgsType) => void
@@ -54,7 +55,7 @@ export interface SquarePropsType {
 
 
 export interface BoardStateType {
-  occupied: ChessPieceArray
+  occupied: StringArray
   position: ChessPieceArray
   moveColor: Array<{
     id: string
@@ -71,7 +72,7 @@ export interface BoardStateType {
 }
 export type BoardStatePayload = Partial<BoardStateType>
 // export interface BoardStatePayload {
-//   occupied?: ChessPieceArray
+//   occupied?: StringArray
 //   position?: ChessPieceArray
 //   moveColor?: Array<{
 //     id: string
@@ -94,7 +95,7 @@ type KilledType = {
 interface InitialStateType {
   positions: ChessPieceType | [],
   savedPositions: ChessPieceType[] | [],
-  occupied: ChessPieceType[],
+  occupied: StringArray,
   killed: KilledType,
   allMoves?: Array<number>[],
 }
